@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Admin user for the admin panel
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Site settings (company info)
+model SiteSetting {
+  id          String @id @default(cuid())
+  key         String @unique
+  value       String @db.Text
+  updatedAt   DateTime @updatedAt
+}
+
+// Service Series (main categories)
+model ServiceSeries {
+  id          String      @id @default(cuid())
+  name        String      @db.VarChar(255)
+  slug        String      @unique @db.VarChar(255)
+  icon        String      @db.VarChar(255)
+  tagline     String      @db.VarChar(500)
+  description String      @db.Text
+  accentColor String      @default("#F59E0B") @db.VarChar(50)
+  order       Int         @default(0)
+  isActive    Boolean     @default(true)
+  subservices SubService[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+// Sub Services (under each series)
+model SubService {
+  id              String        @id @default(cuid())
+  name            String        @db.VarChar(255)
+  slug            String        @unique @db.VarChar(255)
+  description     String        @db.Text
+  benefits        String        @default("[]") // JSON array
+  process         String        @default("[]") // JSON array of {title, desc} objects
+  documents       String        @default("[]") // JSON array
+  eligibility     String        @default("")  // Text content (rich)
+  features        String        @default("[]")  // JSON array
+  pricing         String?       @db.VarChar(255)
+  referenceLink   String?       @db.VarChar(500)
+  registrationTime String?      @db.VarChar(255)
+  order           Int           @default(0)
+  isActive        Boolean       @default(true)
+  seriesId        String        @db.VarChar(191)
+  series          ServiceSeries @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+// Government Schemes
+model Scheme {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(255)
+  slug        String   @unique @db.VarChar(255)
+  description String   @db.Text
+  benefits    String   @db.Text // JSON array
+  eligibility String   @db.Text
+  category    String   @db.VarChar(255)
+  image       String?  @db.VarChar(500)
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Blog Posts
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(255)
+  slug        String   @unique @db.VarChar(255)
+  excerpt     String   @db.Text
+  content     String   @db.LongText
+  coverImage  String?  @db.VarChar(500)
+  category    String   @db.VarChar(255)
+  tags        String   @db.Text // JSON array
+  readTime    String   @default("5 min read") @db.VarChar(50)
+  isPublished Boolean  @default(false)
+  isFeatured  Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Content Articles (knowledge base)
+model ContentArticle {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(255)
+  slug        String   @unique @db.VarChar(255)
+  excerpt     String   @db.Text
+  content     String   @db.LongText
+  coverImage  String?  @db.VarChar(500)
+  category    String   @db.VarChar(255)
+  readTime    String   @default("5 min read") @db.VarChar(50)
+  isPublished Boolean  @default(false)
+  isFeatured  Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Career / Job Listings
+model Career {
+  id           String   @id @default(cuid())
+  title        String   @db.VarChar(255)
+  slug         String   @unique @db.VarChar(255)
+  location     String   @db.VarChar(255)
+  type         String   @db.VarChar(100) // Full Time, Part Time, Contract
+  experience   String   @db.VarChar(255)
+  description  String   @db.LongText
+  requirements String   @db.Text // JSON array
+  department   String   @db.VarChar(255)
+  salary       String?  @db.VarChar(255)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// Contact Inquiries
+model ContactInquiry {
+  id            String   @id @default(cuid())
+  name          String   @db.VarChar(255)
+  email         String   @db.VarChar(255)
+  phone         String?  @db.VarChar(50)
+  subject       String?  @db.VarChar(500)
+  message       String   @db.Text
+  businessType  String?  @db.VarChar(255)
+  fundingAmount String?  @db.VarChar(255)
+  resumeUrl     String?  @db.VarChar(500)
+  experience    String?  @db.VarChar(255)
+  inquiryType   String   @default("general") @db.VarChar(50) // general, career, service, scheme, other
+  filePath      String?  @db.VarChar(500)
+  fileType      String?  @db.VarChar(100)
+  fileName      String?  @db.VarChar(255)
+  isRead        Boolean  @default(false)
+  status        String   @default("new") @db.VarChar(50) // new, in_progress, resolved, closed
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Testimonials
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String   @db.VarChar(255)
+  company   String?  @db.VarChar(255)
+  role      String?  @db.VarChar(255)
+  content   String   @db.Text
+  rating    Int      @default(5)
+  avatarUrl String?  @db.VarChar(500)
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Team Members
+model TeamMember {
+  id        String   @id @default(cuid())
+  name      String   @db.VarChar(255)
+  role      String   @db.VarChar(255)
+  bio       String?  @db.Text
+  avatarUrl String?  @db.VarChar(500)
+  linkedin  String?  @db.VarChar(500)
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// FAQ
+model FAQ {
+  id        String   @id @default(cuid())
+  question  String   @db.Text
+  answer    String   @db.Text
+  category  String   @default("General") @db.VarChar(255)
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Stats (for homepage counters)
+model Stat {
+  id        String @id @default(cuid())
+  label     String @db.VarChar(255)
+  value     Int
+  suffix    String @default("+") @db.VarChar(50)
+  icon      String @db.VarChar(255)
+  color     String @db.VarChar(50)
+  order     Int    @default(0)
+}
