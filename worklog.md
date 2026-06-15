@@ -7,7 +7,7 @@ Current database:
 - Provider: PostgreSQL
 - ORM: Prisma
 - Hosted database: Vercel Prisma Postgres
-- Prisma schema datasource: `anirah_advisory_PRISMA_DATABASE_URL`
+- Prisma schema datasource: `DATABASE_URL`
 
 Notes:
 
