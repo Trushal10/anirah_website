@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Upload, X, FileText, Loader2, CheckCircle2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface FileUploadProps {
   value: string
@@ -22,7 +23,8 @@ export default function FileUpload({ value, onChange, label = 'File', accept = '
     if (!file) return
 
     if (file.size > 10 * 1024 * 1024) {
-      alert('File must be less than 10MB')
+      toast.error('File must be less than 10MB')
+      e.target.value = ''
       return
     }
 
@@ -41,9 +43,10 @@ export default function FileUpload({ value, onChange, label = 'File', accept = '
 
       onChange(data.url)
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Upload failed')
+      toast.error(err instanceof Error ? err.message : 'Upload failed')
     } finally {
       setUploading(false)
+      e.target.value = ''
     }
   }
 

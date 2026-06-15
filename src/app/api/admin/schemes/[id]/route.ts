@@ -12,6 +12,7 @@ export async function PUT(
     const data: Record<string, unknown> = {}
     if (body.title !== undefined) data.title = body.title
     if (body.slug !== undefined) data.slug = body.slug
+    if (body.summary !== undefined) data.summary = body.summary
     if (body.description !== undefined) data.description = body.description
     if (body.benefits !== undefined) {
       data.benefits = typeof body.benefits === 'string' ? body.benefits : JSON.stringify(body.benefits)

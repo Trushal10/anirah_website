@@ -29,14 +29,16 @@ function FadeIn({ children, className = '', delay = 0 }: { children: React.React
 }
 
 /* ─── JSON Parsers ─── */
-function parseJSON<T>(str: string | null | undefined, fallback: T): T {
-  if (!str) return fallback
-  try { return JSON.parse(str) } catch { return fallback }
+function parseJSON<T>(value: T | string | null | undefined, fallback: T): T {
+  if (value == null || value === '') return fallback
+  if (typeof value !== 'string') return value
+  try { return JSON.parse(value) } catch { return fallback }
 }
 
-const benefitIcons = [Rocket, Sparkles, TrendingUp, Award, Lightbulb, Target, Shield, CheckCircle2, Zap, BarChart3]
 
 /* ─── Interfaces ─── */
+const benefitIcons = [Rocket, Sparkles, TrendingUp, Award, Lightbulb, Target, Shield, CheckCircle2, Zap, BarChart3]
+
 interface SubServiceData {
   id: string
   name: string
@@ -107,9 +109,48 @@ const iconMap: Record<string, React.ElementType> = {
   Star,
 }
 
+function groupDocumentItems(items: string[]) {
+  const groups: { title: string; items: string[] }[] = []
+  let current: { title: string; items: string[] } | null = null
+
+  for (const rawItem of items) {
+    const item = rawItem.trim()
+    if (!item) continue
+
+    const heading = item
+      .replace(/^#{1,6}\s*/, '')
+      .replace(/:$/, '')
+      .trim()
+
+    const isHeading = item.startsWith('#') || item.endsWith(':')
+    if (isHeading) {
+      current = { title: heading, items: [] }
+      groups.push(current)
+      continue
+    }
+
+    if (!current) {
+      current = { title: 'Required Documents', items: [] }
+      groups.push(current)
+    }
+    current.items.push(item)
+  }
+
+  return groups.filter((group) => group.items.length > 0)
+}
+
 /* ═══════════════════════════════════════════
    Main Component
    ═══════════════════════════════════════════ */
+function normalizeMatchText(value: string | null | undefined) {
+  return (value || '')
+    .toLowerCase()
+    .replace(/-/g, ' ')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 export default function SubServiceDetailPage() {
   const { pageParam, navigate, settings } = useAppStore()
   const { toast } = useToast()
@@ -151,6 +192,7 @@ export default function SubServiceDetailPage() {
       // Parse sub-service JSON fields
       const parsedSub: SubServiceData = {
         ...subData,
+        features: parseJSON<string[]>(subData.features, []),
         benefits: parseJSON<string[]>(subData.benefits, []),
         process: parseJSON<{ title: string; desc: string }[]>(subData.process, []),
         documents: parseJSON<string[]>(subData.documents, []),
@@ -191,19 +233,64 @@ export default function SubServiceDetailPage() {
   const seriesName = subservice?.series?.name || 'Service'
   const seriesSlug = subservice?.series?.slug || ''
   const seriesTagline = subservice?.series?.tagline || ''
-  const benefits = parseJSON<string[]>(subservice?.benefits as any, [])
-  const processSteps = parseJSON<{ title: string; desc: string }[]>(subservice?.process as any, [])
-  const documents = parseJSON<string[]>(subservice?.documents as any, [])
+  const features = subservice?.features || []
+  const benefits = subservice?.benefits || []
+  const processSteps = subservice?.process || []
+  const documents = subservice?.documents || []
+  const documentGroups = groupDocumentItems(documents)
   const eligibilityHtml = subservice?.eligibility || ''
   const regTime = subservice?.registrationTime || ''
+  const pricing = subservice?.pricing || ''
+
+  const guideServices = features.length > 0 ? features : [
+    'Free consultation and requirement review',
+    'Document checklist and verification support',
+    'Application preparation and portal filing',
+    'Follow-up, correction support, and approval tracking',
+    'Final handover with next-step guidance',
+    'Post-service compliance and advisory support',
+  ]
+  const guideBenefits = benefits.length > 0 ? benefits : [
+    'Clear guidance before you start the process',
+    'Reduced chance of document or filing mistakes',
+    'Professional support from planning to approval',
+    'Transparent timeline, requirements, and handover',
+    'Better readiness for compliance, banking, and growth',
+  ]
+  const guideProcessSteps = processSteps.length > 0 ? processSteps : [
+    { title: 'Consultation', desc: `We understand your requirement for ${subservice?.name} and explain the right process, timeline, and documents.` },
+    { title: 'Document Review', desc: 'Our team checks the submitted documents and helps you fix missing or incorrect details before filing.' },
+    { title: 'Preparation & Filing', desc: 'We prepare the required application, forms, declarations, and supporting documents for submission.' },
+    { title: 'Approval & Handover', desc: 'After approval, we share the final documents and guide you on the next important steps.' },
+  ]
+  const guideDocumentGroups = documentGroups.length > 0 ? documentGroups : [
+    {
+      title: 'Applicant Details',
+      items: ['PAN card or identity proof', 'Aadhaar card or address proof', 'Mobile number and email address', 'Passport size photograph if required'],
+    },
+    {
+      title: 'Business Details',
+      items: ['Business name and activity details', 'Registered office or business address proof', 'Rent agreement or NOC if applicable'],
+    },
+  ]
 
   const otherServices = allServices.filter((s) => s.slug !== seriesSlug).slice(0, 6)
-  const relatedFaqs = faqs.filter(
-    (f) =>
-      f.category.toLowerCase().includes(seriesName.toLowerCase()) ||
-      seriesName.toLowerCase().includes(f.category.toLowerCase()) ||
-      f.category.toLowerCase().includes(subservice?.name?.toLowerCase().split(' ')[0] || '')
-  )
+  const faqTerms = [
+    subservice?.name,
+    subservice?.slug,
+    seriesName,
+    seriesSlug,
+  ]
+    .map(normalizeMatchText)
+    .filter(Boolean)
+  const relatedFaqs = faqs.filter((faq) => {
+    const category = normalizeMatchText(faq.category)
+    const question = normalizeMatchText(faq.question)
+    return faqTerms.some((term) => {
+      const keyword = term.split(' ')[0]
+      return category.includes(term) || term.includes(category) || question.includes(term) || question.includes(keyword)
+    })
+  })
   const displayFaqs = relatedFaqs.length > 0 ? relatedFaqs : faqs.slice(0, 4)
 
   const phone = settings?.phone || ''
@@ -241,20 +328,15 @@ export default function SubServiceDetailPage() {
   }
 
   /* ─── Strip HTML for plain text ─── */
-  const plainDescription = subservice.description
-    ? richTextToPlainText(subservice.description)
-    .trim()
-    : ''
-
   return (
     <div>
       {/* ═══════════════════════════════════════
           SECTION 1: Hero
           ═══════════════════════════════════════ */}
-      <section className="relative overflow-hidden" style={{ backgroundColor: '#010000' }}>
-        <div className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl opacity-20" style={{ backgroundColor: accent }} />
-        <div className="absolute bottom-0 left-0 w-72 h-72 rounded-full blur-3xl opacity-10" style={{ backgroundColor: '#16A34A' }} />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+      <section className="relative overflow-hidden bg-gray-950">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(240,179,84,0.18),transparent_30%),radial-gradient(circle_at_84%_14%,rgba(22,163,74,0.14),transparent_28%)]" />
+        <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,.8)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.8)_1px,transparent_1px)] [background-size:48px_48px]" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-24">
           <FadeIn>
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 flex-wrap">
@@ -283,16 +365,15 @@ export default function SubServiceDetailPage() {
                 </p>
 
                 {/* Description */}
-                <div className="prose prose-invert prose-sm max-w-none mb-8 text-gray-400 leading-relaxed">
+                <div className="prose-content prose-content-invert max-w-none mb-8 text-gray-300 leading-relaxed">
                   <div dangerouslySetInnerHTML={{ __html: richTextToHtml(subservice.description) }} />
                 </div>
 
                 {/* CTA Buttons */}
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <Button
                     onClick={() => navigate('contact')}
-                    className="rounded-xl shadow-lg hover:shadow-xl transition-all"
-                    style={{ backgroundColor: accent, color: accentText }}
+                    className="primary-action"
                     size="lg"
                   >
                     Get Free Consultation <ArrowRight className="w-4 h-4 ml-2" />
@@ -300,7 +381,7 @@ export default function SubServiceDetailPage() {
                   {phone && (
                     <Button
                       variant="outline"
-                      className="border-white/20 text-white hover:bg-white/10 rounded-xl"
+                      className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white rounded-xl"
                       size="lg"
                       asChild
                     >
@@ -312,7 +393,7 @@ export default function SubServiceDetailPage() {
                   {subservice.referenceLink && (
                     <Button
                       variant="outline"
-                      className="border-white/20 text-white hover:bg-white/10 rounded-xl"
+                      className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white rounded-xl"
                       size="lg"
                       asChild
                     >
@@ -327,7 +408,7 @@ export default function SubServiceDetailPage() {
               {/* Right Side - Quick Info Cards */}
               <div className="lg:col-span-2 space-y-4">
                 {regTime && (
-                  <Card className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl">
+                  <Card className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
                     <CardContent className="p-5 flex items-center gap-4">
                       <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${accent}20` }}>
                         <Clock className="w-6 h-6" style={{ color: accent }} />
@@ -339,7 +420,18 @@ export default function SubServiceDetailPage() {
                     </CardContent>
                   </Card>
                 )}
-                <Card className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl">
+                <Card className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
+                  <CardContent className="p-5 flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${accent}20` }}>
+                      <Landmark className="w-6 h-6" style={{ color: accent }} />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400 uppercase tracking-wide">Pricing</p>
+                      <p className="font-semibold text-white">{pricing || 'Get custom quote'}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
                   <CardContent className="p-5 flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${accent}20` }}>
                       <Shield className="w-6 h-6" style={{ color: accent }} />
@@ -350,7 +442,7 @@ export default function SubServiceDetailPage() {
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl">
+                <Card className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
                   <CardContent className="p-5 flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${accent}20` }}>
                       <CheckCircle className="w-6 h-6" style={{ color: accent }} />
@@ -392,14 +484,64 @@ export default function SubServiceDetailPage() {
       )}
 
       {/* ═══════════════════════════════════════
+          SECTION 2B: Service Content Overview
+          â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+      <section className="section-pad bg-white">
+          <div className="section-shell">
+            <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-start">
+                <FadeIn>
+                  <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-7">
+                    <span className="section-kicker mb-4">Our Services</span>
+                    <h2 className="mb-4 text-2xl font-bold text-gray-950 sm:text-3xl">
+                      What You Get With {subservice.name}
+                    </h2>
+                    <p className="mb-6 text-sm leading-relaxed text-gray-500">
+                      Complete assistance for every important step, from planning and documents to filing and final approval.
+                    </p>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {guideServices.map((feature, index) => (
+                        <div key={feature} className="flex items-start gap-3 rounded-xl border border-gray-100 bg-gray-50/80 p-3">
+                          <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-mint-50 text-xs font-bold text-mint-700">
+                            {index + 1}
+                          </span>
+                          <span className="text-sm font-medium leading-relaxed text-gray-700">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </FadeIn>
+
+                <FadeIn delay={0.1}>
+                  <div className="rounded-2xl border border-gray-900 bg-gray-950 p-5 text-white shadow-sm sm:p-7">
+                    <span className="mb-4 inline-flex rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-brand-200">
+                      Client Guide
+                    </span>
+                    <h2 className="mb-5 text-2xl font-bold sm:text-3xl">
+                      Why This Service Helps
+                    </h2>
+                    <div className="space-y-3">
+                      {guideBenefits.slice(0, 10).map((benefit) => (
+                        <div key={benefit} className="flex items-start gap-3 rounded-xl bg-white/[0.06] p-3">
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-mint-300" />
+                          <span className="text-sm leading-relaxed text-white/78">{benefit}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </FadeIn>
+            </div>
+          </div>
+        </section>
+
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
           SECTION 3: What We Offer (sibling subservices grid)
           ═══════════════════════════════════════ */}
-      {siblingSubservices.length > 1 && (
-        <section className="py-16 lg:py-20">
+      {false && siblingSubservices.length > 1 && (
+      <section className="section-pad bg-gray-50/80">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <FadeIn>
               <div className="text-center mb-12">
-                <Badge variant="secondary" className="mb-3">What We Offer</Badge>
+                <span className="section-kicker mb-3">What We Offer</span>
                 <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
                   All {seriesName} Services
                 </h2>
@@ -415,10 +557,10 @@ export default function SubServiceDetailPage() {
                   <FadeIn key={sub.id} delay={i * 0.05}>
                     <Card
                       onClick={() => !isActive && navigate('subservice-detail', sub.slug)}
-                      className={`group rounded-2xl border transition-all duration-300 h-full bg-white overflow-hidden cursor-pointer ${
+                      className={`group h-full cursor-pointer overflow-hidden rounded-xl border bg-white transition-all duration-300 ${
                         isActive
                           ? 'shadow-lg ring-2'
-                          : 'border-gray-100 hover:shadow-xl hover:-translate-y-1'
+                          : 'border-gray-200 hover:-translate-y-0.5 hover:border-mint-200 hover:shadow-lg hover:shadow-black/5'
                       }`}
                       style={isActive ? { borderColor: accent, '--tw-ring-color': accent } as React.CSSProperties : {}}
                     >
@@ -454,51 +596,56 @@ export default function SubServiceDetailPage() {
           SECTION 4: Included Services (numbered list)
           ═══════════════════════════════════════ */}
       {siblingSubservices.length > 1 && (
-        <section className="py-16 lg:py-20 bg-gray-50">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="section-pad bg-white">
+          <div className="section-shell">
             <FadeIn>
-              <div className="text-center mb-12">
-                <Badge variant="secondary" className="mb-3">Included Services</Badge>
+              <div className="mx-auto mb-12 max-w-3xl text-center">
+                <span className="section-kicker mb-3">Included Services</span>
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">What&apos;s Included</h2>
+                <p className="text-gray-500">
+                  See every service available in this category and jump between related options easily.
+                </p>
               </div>
             </FadeIn>
-            <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
               {siblingSubservices.map((sub, i) => {
                 const isActive = sub.slug === subservice.slug
                 return (
                   <FadeIn key={sub.id} delay={i * 0.05}>
-                    <div
+                    <button
                       onClick={() => !isActive && navigate('subservice-detail', sub.slug)}
-                      className={`flex items-start gap-4 p-5 rounded-xl transition-all cursor-pointer ${
+                      className={`group flex h-full w-full items-start gap-4 rounded-2xl p-5 text-left transition-all ${
                         isActive
-                          ? 'bg-white shadow-md border-l-4'
-                          : 'bg-white border border-gray-100 hover:shadow-md hover:border-l-4'
+                          ? 'border border-mint-200 bg-mint-50/35 shadow-sm'
+                          : 'border border-gray-200 bg-white hover:-translate-y-0.5 hover:border-mint-200 hover:shadow-lg hover:shadow-black/5'
                       }`}
-                      style={{ borderLeftColor: accent }}
                     >
                       <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
+                        className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl text-sm font-bold"
                         style={{ backgroundColor: accent, color: accentText }}
                       >
-                        {i + 1}
+                        {String(i + 1).padStart(2, '0')}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 mb-1">
+                        <h3 className="mb-2 font-bold text-gray-950 transition group-hover:text-mint-700">
                           {sub.name}
                           {isActive && (
-                            <span className="ml-2 text-xs font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: accent, color: accentText }}>
+                            <span className="ml-2 rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: accent, color: accentText }}>
                               Viewing
                             </span>
                           )}
                         </h3>
-                        <p className="text-sm text-gray-500 line-clamp-2">
+                        <p className="line-clamp-2 text-sm leading-relaxed text-gray-500">
                           {richTextToPlainText(sub.description)}
                         </p>
+                        {!isActive && (
+                          <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-mint-700">
+                            View details
+                            <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" />
+                          </span>
+                        )}
                       </div>
-                      {!isActive && (
-                        <ArrowRight className="w-4 h-4 mt-1 flex-shrink-0 text-gray-400" />
-                      )}
-                    </div>
+                    </button>
                   </FadeIn>
                 )
               })}
@@ -510,12 +657,12 @@ export default function SubServiceDetailPage() {
       {/* ═══════════════════════════════════════
           SECTION 5: Why Choose Our Service (Benefits)
           ═══════════════════════════════════════ */}
-      {benefits.length > 0 && (
+      {false && benefits.length > 0 && (
         <section className="py-16 lg:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <FadeIn>
               <div className="text-center mb-12">
-                <Badge variant="secondary" className="mb-3">Key Benefits</Badge>
+                <span className="section-kicker mb-3">Key Benefits</span>
                 <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
                   Why Choose {subservice.name}
                 </h2>
@@ -527,7 +674,7 @@ export default function SubServiceDetailPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {benefits.map((benefit, i) => (
                 <FadeIn key={i} delay={i * 0.05}>
-                  <Card className="rounded-xl border-0 shadow-sm bg-white h-full hover:shadow-md transition-shadow">
+                    <Card className="h-full rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
                     <CardContent className="p-6">
                       {(() => {
                         const BenefitIcon = benefitIcons[i % benefitIcons.length]
@@ -547,105 +694,114 @@ export default function SubServiceDetailPage() {
       {/* ═══════════════════════════════════════
           SECTION 6: How We Work (Process Steps)
           ═══════════════════════════════════════ */}
-      {processSteps.length > 0 && (
-        <section className="py-16 lg:py-20 bg-gray-50">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="section-pad bg-gray-50/80">
+          <div className="section-shell">
             <FadeIn>
-              <div className="text-center mb-12">
-                <Badge variant="secondary" className="mb-3">Our Process</Badge>
-                <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">How We Work</h2>
+              <div className="mx-auto mb-12 max-w-3xl text-center">
+                <span className="section-kicker mb-3">Our Process</span>
+                <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Simple Step-by-Step Guidance</h2>
                 <p className="text-gray-500 max-w-2xl mx-auto">
-                  A simple 4-step process to get your {subservice.name} done efficiently.
+                  A clear path from consultation and document verification to submission, follow-up, and final handover.
                 </p>
               </div>
             </FadeIn>
-            <div className="relative">
-              {/* Vertical line connecting steps */}
-              <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200 hidden sm:block" />
-
-              <div className="space-y-8">
-                {processSteps.map((step, i) => (
+            <div className="grid gap-4 lg:grid-cols-4">
+                {guideProcessSteps.map((step, i) => (
                   <FadeIn key={i} delay={i * 0.1}>
-                    <div className="flex items-start gap-6 relative">
-                      {/* Step number circle */}
+                    <div className="relative h-full rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                      {i < guideProcessSteps.length - 1 && (
+                        <div className="absolute left-[calc(100%-0.5rem)] top-10 hidden h-px w-8 bg-gray-200 lg:block" />
+                      )}
                       <div
-                        className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold z-10 shadow-lg"
+                        className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl text-sm font-bold"
                         style={{ backgroundColor: accent, color: accentText }}
                       >
                         {i + 1}
                       </div>
-                      {/* Step content */}
-                      <div className="flex-1 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
-                        <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
-                      </div>
+                      <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-400">
+                        Step {i + 1}
+                      </span>
+                      <h3 className="mb-2 text-lg font-bold text-gray-950">{step.title}</h3>
+                      <p className="text-sm leading-relaxed text-gray-500">{step.desc}</p>
                     </div>
                   </FadeIn>
                 ))}
-              </div>
             </div>
           </div>
         </section>
-      )}
 
       {/* ═══════════════════════════════════════
           SECTION 7: Eligibility Criteria
           ═══════════════════════════════════════ */}
-      {eligibilityHtml && (
-        <section className="py-16 lg:py-20">
+      <section className="section-pad bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-12">
               {/* Eligibility */}
               <FadeIn>
-                <div className="bg-white rounded-2xl border border-gray-100 p-8">
+                <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${accent}15` }}>
                       <CheckCircle className="w-5 h-5" style={{ color: accent }} />
                     </div>
-                    <h2 className="text-xl font-bold text-gray-900">Eligibility Criteria</h2>
+                    <h2 className="text-xl font-bold text-gray-900">Who This Is For</h2>
                   </div>
-                  <div
-                    className="prose prose-sm max-w-none text-gray-600"
-                    dangerouslySetInnerHTML={{ __html: richTextToHtml(eligibilityHtml) }}
-                  />
+                  {eligibilityHtml ? (
+                    <div
+                      className="prose-content max-w-none text-gray-600"
+                      dangerouslySetInnerHTML={{ __html: richTextToHtml(eligibilityHtml) }}
+                    />
+                  ) : (
+                    <div className="space-y-3 text-sm leading-relaxed text-gray-600">
+                      <p>
+                        This service is suitable for founders, MSMEs, professionals, and growing businesses that need structured support for {subservice.name}.
+                      </p>
+                      <p>
+                        Exact eligibility can vary by business activity, location, documents, and portal requirements. Our team reviews these details before starting the application.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </FadeIn>
 
               {/* Documents */}
-              {documents.length > 0 && (
                 <FadeIn delay={0.2}>
-                  <div className="bg-white rounded-2xl border border-gray-100 p-8">
+                  <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-brand-50">
-                        <FileText className="w-5 h-5 text-brand-600" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: `${accent}15` }}>
+                        <FileText className="h-5 w-5" style={{ color: accent }} />
                       </div>
                       <h2 className="text-xl font-bold text-gray-900">Required Documents</h2>
                     </div>
-                    <ul className="space-y-3">
-                      {documents.map((doc, i) => (
-                        <li key={i} className="flex items-start gap-3">
-                          <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-brand-600" />
-                          <span className="text-sm text-gray-600">{doc}</span>
-                        </li>
+                    <div className="space-y-5">
+                      {guideDocumentGroups.map((group) => (
+                        <div key={group.title}>
+                          <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-gray-500">{group.title}</h3>
+                          <ul className="space-y-3">
+                            {group.items.map((doc) => (
+                              <li key={doc} className="flex items-start gap-3">
+                                <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0" style={{ color: accent }} />
+                                <span className="text-sm leading-relaxed text-gray-600">{doc}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 </FadeIn>
-              )}
             </div>
           </div>
         </section>
-      )}
 
       {/* ═══════════════════════════════════════
           SECTION 8: FAQ Section
           ═══════════════════════════════════════ */}
       {displayFaqs.length > 0 && (
-        <section className="py-16 lg:py-20 bg-gray-50">
+      <section className="section-pad bg-gray-50/80">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <FadeIn>
               <div className="text-center mb-12">
-                <Badge variant="secondary" className="mb-3">FAQs</Badge>
+                <span className="section-kicker mb-3">FAQs</span>
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
               </div>
             </FadeIn>
@@ -674,9 +830,7 @@ export default function SubServiceDetailPage() {
       {/* ═══════════════════════════════════════
           SECTION 9: CTA - Ready to Get Started
           ═══════════════════════════════════════ */}
-      <section className="py-16 lg:py-20 relative overflow-hidden bg-gray-950">
-        <div className="absolute top-0 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
+      <section className="section-pad relative overflow-hidden bg-gray-950">
         <div className="relative max-w-4xl mx-auto px-4 text-center">
           <FadeIn>
             <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center mx-auto mb-6">
@@ -691,8 +845,7 @@ export default function SubServiceDetailPage() {
             <div className="flex flex-wrap justify-center gap-4">
               <Button
                 size="lg"
-                className="bg-white hover:bg-gray-100 rounded-xl shadow-lg font-semibold"
-                style={{ color: accent }}
+                className="primary-action"
                 onClick={() => navigate('contact')}
               >
                 Get Free Consultation <ArrowRight className="w-4 h-4 ml-2" />
@@ -701,7 +854,7 @@ export default function SubServiceDetailPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-white/30 text-white hover:bg-white/10 rounded-xl"
+                  className="border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white rounded-xl"
                   asChild
                 >
                   <a href={`tel:${phone}`}>
@@ -718,11 +871,11 @@ export default function SubServiceDetailPage() {
           SECTION 10: Other Services
           ═══════════════════════════════════════ */}
       {otherServices.length > 0 && (
-        <section className="py-16 lg:py-20">
+      <section className="section-pad bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <FadeIn>
               <div className="text-center mb-12">
-                <Badge variant="secondary" className="mb-3">Explore More</Badge>
+                <span className="section-kicker mb-3">Explore More</span>
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">Other Service Categories</h2>
                 <p className="text-gray-500 max-w-2xl mx-auto">
                   Discover our comprehensive range of business services.

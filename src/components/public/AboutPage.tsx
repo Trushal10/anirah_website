@@ -33,7 +33,7 @@ const statIconMap: Record<string, React.ElementType> = {
 }
 
 const milestones = [
-  { year: '2018', title: 'Founded', desc: 'FundGrow was established in Ahmedabad to support entrepreneurs with practical business consultancy.' },
+  { year: '2018', title: 'Founded', desc: 'Anirah Advisory was established in Ahmedabad to support entrepreneurs with practical business consultancy.' },
   { year: '2019', title: '1,000 Projects', desc: 'Completed a major milestone across registrations, certifications, and compliance filings.' },
   { year: '2020', title: '10+ Services', desc: 'Expanded into registration, legal, funding, certification, and compliance services.' },
   { year: '2022', title: 'Pan India', desc: 'Started serving businesses across India with a growing consultant network.' },
@@ -69,7 +69,7 @@ export default function AboutPage() {
       <PageHero
         kicker="Our Story"
         title="Buland Sapno ke Saath,"
-        highlight="FundGrow"
+        highlight="Anirah Advisory"
         description="We are an Ahmedabad-based consultancy helping entrepreneurs launch, fund, protect, and scale their businesses."
         icon={<Building2 className="h-4 w-4 text-brand-300" />}
       />
@@ -105,7 +105,7 @@ export default function AboutPage() {
             <h2 className="section-heading mt-4">Business consultancy built around execution</h2>
             <p className="section-copy mt-5">
               {settings?.about_text ||
-                'FundGrow helps business owners handle registration, compliance, legal documentation, funding support, and growth essentials through one coordinated consulting team.'}
+                'Anirah Advisory helps business owners handle registration, compliance, legal documentation, funding support, and growth essentials through one coordinated consulting team.'}
             </p>
           </div>
 
@@ -159,7 +159,7 @@ export default function AboutPage() {
           <div className="section-shell">
             <div className="mx-auto max-w-3xl text-center">
               <span className="section-kicker">Leadership Team</span>
-              <h2 className="section-heading mt-4">Meet the people behind FundGrow</h2>
+              <h2 className="section-heading mt-4">Meet the people behind Anirah Advisory</h2>
               <p className="section-copy mt-4">A team with experience across business consulting, finance, operations, and compliance.</p>
             </div>
             <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -188,7 +188,7 @@ export default function AboutPage() {
         </section>
       )}
 
-      <section className="section-pad bg-gray-50">
+      <section className="section-pad bg-gradient-to-br from-mint-50 via-white to-brand-50">
         <div className="section-shell">
           <div className="mx-auto max-w-3xl text-center">
             <span className="section-kicker">Our Foundation</span>
@@ -196,9 +196,9 @@ export default function AboutPage() {
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2">
             {values.map((value) => (
-              <div key={value.title} className="surface-card p-6">
+              <div key={value.title} className="rounded-lg border border-mint-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-mint-200 hover:shadow-lg hover:shadow-black/5">
                 <div className="flex gap-4">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-gray-950 text-brand-300">
+                  <div className="brand-gradient flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg text-white shadow-sm">
                     <value.icon className="h-6 w-6" />
                   </div>
                   <div>

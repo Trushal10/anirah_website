@@ -74,7 +74,7 @@ export default function BlogPage() {
                 onClick={() => setActiveCategory(category)}
                 className={`shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition ${
                   activeCategory === category
-                    ? 'border-transparent bg-gradient-to-r from-brand-500 to-mint-600 text-white shadow-sm'
+                    ? 'border-[#F0B354] bg-[#F0B354] text-black shadow-none'
                     : 'border-gray-200 bg-white text-gray-600 hover:border-brand-300 hover:text-brand-700'
                 }`}
               >
@@ -91,7 +91,7 @@ export default function BlogPage() {
                     onClick={() => navigate('blog-detail', post.slug)}
                     className="surface-card surface-card-hover group flex h-full cursor-pointer flex-col overflow-hidden border border-gray-200"
                   >
-                    <div className="h-44 overflow-hidden bg-gray-100">
+                    <div className="h-60 overflow-hidden bg-gray-100">
                       {post.coverImage ? (
                         <img src={post.coverImage} alt={post.title} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
                       ) : (

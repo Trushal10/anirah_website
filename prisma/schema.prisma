@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("anirah_advisory_PRISMA_DATABASE_URL")
 }
 
 // Admin user for the admin panel
@@ -34,6 +34,9 @@ model ServiceSeries {
   icon        String      @db.VarChar(255)
   tagline     String      @db.VarChar(500)
   description String      @db.Text
+  seoTitle    String?     @db.VarChar(255)
+  seoDescription String?  @db.Text
+  seoKeywords String?     @db.Text
   accentColor String      @default("#F59E0B") @db.VarChar(50)
   order       Int         @default(0)
   isActive    Boolean     @default(true)
@@ -48,11 +51,14 @@ model SubService {
   name            String        @db.VarChar(255)
   slug            String        @unique @db.VarChar(255)
   description     String        @db.Text
-  benefits        String        @default("[]") // JSON array
-  process         String        @default("[]") // JSON array of {title, desc} objects
-  documents       String        @default("[]") // JSON array
-  eligibility     String        @default("")  // Text content (rich)
-  features        String        @default("[]")  // JSON array
+  seoTitle        String?       @db.VarChar(255)
+  seoDescription  String?       @db.Text
+  seoKeywords     String?       @db.Text
+  benefits        String        @db.Text // JSON array
+  process         String        @db.Text // JSON array of {title, desc} objects
+  documents       String        @db.Text // JSON array
+  eligibility     String        @db.Text  // Text content (rich)
+  features        String        @db.Text  // JSON array
   pricing         String?       @db.VarChar(255)
   referenceLink   String?       @db.VarChar(500)
   registrationTime String?      @db.VarChar(255)
@@ -69,6 +75,7 @@ model Scheme {
   id          String   @id @default(cuid())
   title       String   @db.VarChar(255)
   slug        String   @unique @db.VarChar(255)
+  summary     String?  @db.Text
   description String   @db.Text
   benefits    String   @db.Text // JSON array
   eligibility String   @db.Text
@@ -87,6 +94,9 @@ model BlogPost {
   slug        String   @unique @db.VarChar(255)
   excerpt     String   @db.Text
   content     String   @db.LongText
+  seoTitle    String?  @db.VarChar(255)
+  seoDescription String? @db.Text
+  seoKeywords String?  @db.Text
   coverImage  String?  @db.VarChar(500)
   category    String   @db.VarChar(255)
   tags        String   @db.Text // JSON array
@@ -105,6 +115,9 @@ model ContentArticle {
   slug        String   @unique @db.VarChar(255)
   excerpt     String   @db.Text
   content     String   @db.LongText
+  seoTitle    String?  @db.VarChar(255)
+  seoDescription String? @db.Text
+  seoKeywords String?  @db.Text
   coverImage  String?  @db.VarChar(500)
   category    String   @db.VarChar(255)
   readTime    String   @default("5 min read") @db.VarChar(50)

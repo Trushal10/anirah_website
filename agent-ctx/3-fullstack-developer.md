@@ -8,7 +8,7 @@ Complete redesign of 5 public-facing components (Header, Footer, HomePage, Caree
 **1. Header.tsx - Complete Rewrite:**
 - Announcement bar: bg-navy-950 with white text, Track Application link, phone number
 - Header: White background with shadow on scroll
-- Logo: Company logo from settings or gradient bg square (brand-400 to mint-300) with FG text
+- Logo: Company logo from settings or gradient bg square (brand-400 to mint-300) with AA text
 - Navigation: Home, Services (dropdown), About Us, Blog, Career, Contact Us
 - Services dropdown: 2-column grid with icons and taglines
 - Right side: Phone number, Start Funding Journey button (bg-brand-400 text-navy-950)
@@ -26,7 +26,7 @@ Complete redesign of 5 public-facing components (Header, Footer, HomePage, Caree
 1. Hero: Gold gradient, eligibility card, CTA buttons, trust badges
 2. Government Schemes: Grid from /api/schemes
 3. Why Choose Us: 4 static cards
-4. Why FundGrow: 3 stats with mint-300 color
+4. Why Anirah Advisory: 3 stats with mint-300 color
 5. Services Grid: From /api/services with subservice count
 6. Success Stories: Card grid (not carousel) from /api/testimonials
 7. Pan-India Presence: Dark section with 4 animated stats

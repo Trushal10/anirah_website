@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { hashPassword, isPasswordHash, verifyPassword } from '@/lib/password'
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,17 +15,22 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    if (normalizedEmail === 'admin@fundgrow.in' && normalizedPassword === 'admin123') {
+    const admin = await db.admin.findUnique({
+      where: { email: normalizedEmail },
+    })
+
+    if (!admin && normalizedEmail === 'admin@anirahadvisory.in' && normalizedPassword === 'admin123') {
+      const passwordHash = hashPassword(normalizedPassword)
       const admin = await db.admin.upsert({
         where: { email: normalizedEmail },
         update: {
-          name: 'FundGrow Admin',
+          name: 'Anirah Advisory Admin',
           role: 'admin',
         },
         create: {
           email: normalizedEmail,
-          password: normalizedPassword,
-          name: 'FundGrow Admin',
+          password: passwordHash,
+          name: 'Anirah Advisory Admin',
           role: 'admin',
         },
       })
@@ -36,15 +42,18 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    const admin = await db.admin.findUnique({
-      where: { email: normalizedEmail },
-    })
-
-    if (!admin || admin.password !== normalizedPassword) {
+    if (!admin || !verifyPassword(normalizedPassword, admin.password)) {
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: 401 }
       )
+    }
+
+    if (!isPasswordHash(admin.password)) {
+      await db.admin.update({
+        where: { id: admin.id },
+        data: { password: hashPassword(normalizedPassword) },
+      })
     }
 
     return NextResponse.json({

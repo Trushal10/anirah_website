@@ -22,28 +22,30 @@ export default function BlogDetailPage() {
   const { pageParam, navigate, settings } = useAppStore()
   const [post, setPost] = useState<BlogPost | null>(null)
   const [related, setRelated] = useState<BlogPost[]>([])
-  const [loading, setLoading] = useState(!pageParam)
-  const [redirecting, setRedirecting] = useState(false)
+  const [loadedSlug, setLoadedSlug] = useState('')
 
   useEffect(() => {
     if (!pageParam) {
-      setRedirecting(true)
       navigate('blog')
       return
     }
-    fetch(`/api/blog/${pageParam}`)
+
+    fetch(`/api/blog/${encodeURIComponent(pageParam)}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.error) {
-          setRedirecting(true)
           setPost(null)
+          setLoadedSlug(pageParam)
           navigate('blog')
           return
         }
         setPost(data)
-        setLoading(false)
+        setLoadedSlug(pageParam)
       })
-      .catch(() => setLoading(false))
+      .catch(() => {
+        setPost(null)
+        setLoadedSlug(pageParam)
+      })
 
     fetch('/api/blog')
       .then((r) => r.json())
@@ -53,6 +55,9 @@ export default function BlogDetailPage() {
       })
       .catch(() => {})
   }, [pageParam])
+
+  const loading = Boolean(pageParam && loadedSlug !== pageParam)
+  const redirecting = !pageParam
 
   if (loading) {
     return <div className="max-w-4xl mx-auto px-4 py-20"><div className="animate-pulse space-y-6"><div className="h-64 bg-gray-100 rounded-2xl" /><div className="h-96 bg-gray-100 rounded-2xl" /></div></div>
@@ -95,7 +100,7 @@ export default function BlogDetailPage() {
         <FadeIn>
           <div className="surface-card overflow-hidden">
             {post.coverImage && (
-              <div className="h-72 overflow-hidden bg-gray-100">
+              <div className="h-100 overflow-hidden bg-gray-100">
                 <img src={post.coverImage} alt={post.title} className="h-full w-full object-cover" />
               </div>
             )}
@@ -117,7 +122,7 @@ export default function BlogDetailPage() {
               <User className="w-5 h-5 text-brand-300" />
             </div>
             <div>
-              <p className="font-medium text-gray-900 text-sm">{settings.company_name || 'FundGrow'} Team</p>
+              <p className="font-medium text-gray-900 text-sm">{settings.company_name || 'Anirah Advisory'} Team</p>
               <p className="text-xs text-gray-500">MSME Business Consultancy</p>
             </div>
           </div>
@@ -126,7 +131,7 @@ export default function BlogDetailPage() {
         {/* Content */}
         <FadeIn>
           <article
-            className="prose prose-lg max-w-none prose-headings:text-gray-950 prose-p:text-gray-700 prose-a:text-brand-700 leading-relaxed mb-12"
+            className="prose-content max-w-none text-gray-700 leading-relaxed mb-12"
             dangerouslySetInnerHTML={{ __html: richTextToHtml(post.content) }}
           />
         </FadeIn>

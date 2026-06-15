@@ -39,7 +39,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Plus, Pencil, Trash2, Eye, Loader2 } from 'lucide-react'
+import { ArrowLeft, Plus, Pencil, Trash2, Eye, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import ImageUpload from '@/components/admin/ImageUpload'
 import RichTextEditor from '@/components/admin/RichTextEditor'
@@ -51,6 +51,9 @@ interface ContentArticle {
   slug: string
   excerpt: string
   content: string
+  seoTitle: string | null
+  seoDescription: string | null
+  seoKeywords: string | null
   coverImage: string | null
   category: string
   readTime: string
@@ -66,6 +69,9 @@ const emptyForm = {
   slug: '',
   excerpt: '',
   content: '',
+  seoTitle: '',
+  seoDescription: '',
+  seoKeywords: '',
   coverImage: '',
   category: '',
   readTime: '5 min read',
@@ -119,6 +125,9 @@ export default function AdminContent() {
       slug: article.slug,
       excerpt: article.excerpt,
       content: article.content,
+      seoTitle: article.seoTitle || '',
+      seoDescription: article.seoDescription || '',
+      seoKeywords: article.seoKeywords || '',
       coverImage: article.coverImage || '',
       category: article.category,
       readTime: article.readTime,
@@ -199,15 +208,25 @@ export default function AdminContent() {
     <div className="p-4 md:p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold">Content Articles</h2>
-          <p className="text-sm text-muted-foreground">Manage your knowledge base content</p>
+          <h2 className="text-xl font-semibold">{dialogOpen ? (editing ? 'Edit Article' : 'New Article') : 'Content Articles'}</h2>
+          <p className="text-sm text-muted-foreground">
+            {dialogOpen ? 'Write and format the full article content.' : 'Manage your knowledge base content'}
+          </p>
         </div>
-        <Button onClick={openCreate}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Article
-        </Button>
+        {dialogOpen ? (
+          <Button variant="outline" onClick={() => setDialogOpen(false)}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+        ) : (
+          <Button onClick={openCreate}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Article
+          </Button>
+        )}
       </div>
 
+      {!dialogOpen && (
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
@@ -267,14 +286,13 @@ export default function AdminContent() {
           </div>
         </CardContent>
       </Card>
+      )}
 
-      {/* Create/Edit Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editing ? 'Edit Article' : 'New Article'}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
+      {/* Create/Edit Page */}
+      {dialogOpen && (
+        <Card>
+          <CardContent className="p-4 md:p-6">
+          <div className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2 sm:col-span-2">
                 <Label>Title *</Label>
@@ -344,6 +362,38 @@ export default function AdminContent() {
               />
               {errors.content && <p className="text-sm text-destructive">{errors.content}</p>}
             </div>
+            <div className="rounded-lg border p-4 space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold">SEO Meta</h3>
+                <p className="text-xs text-muted-foreground">Used for this content article detail page.</p>
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Title</Label>
+                <Input
+                  value={form.seoTitle}
+                  onChange={(e) => setForm({ ...form, seoTitle: e.target.value })}
+                  placeholder="SEO title for this content article"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Description</Label>
+                <Textarea
+                  value={form.seoDescription}
+                  onChange={(e) => setForm({ ...form, seoDescription: e.target.value })}
+                  rows={3}
+                  placeholder="SEO description for this content article"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Keywords</Label>
+                <Textarea
+                  value={form.seoKeywords}
+                  onChange={(e) => setForm({ ...form, seoKeywords: e.target.value })}
+                  rows={2}
+                  placeholder="keyword one, keyword two, keyword three"
+                />
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Read Time</Label>
@@ -374,8 +424,9 @@ export default function AdminContent() {
               {editing ? 'Update Article' : 'Create Article'}
             </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Preview Dialog */}
       <Dialog open={!!previewArticle} onOpenChange={() => setPreviewArticle(null)}>
@@ -392,7 +443,7 @@ export default function AdminContent() {
               </div>
               <p className="text-muted-foreground italic">{previewArticle.excerpt}</p>
               <div
-                className="prose prose-sm dark:prose-invert max-w-none"
+                className="prose-content max-w-none"
                 dangerouslySetInnerHTML={{ __html: richTextToHtml(previewArticle.content) }}
               />
             </div>

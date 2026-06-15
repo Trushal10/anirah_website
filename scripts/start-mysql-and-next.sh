@@ -49,7 +49,7 @@ if ! $MYSQL_HOME/bin/mysql -S $SOCKET_DIR/mysqld.sock -u root -e "SELECT 1" >/de
         echo "[MySQL] Ready!"
         # Ensure database exists
         $MYSQL_HOME/bin/mysql -S $SOCKET_DIR/mysqld.sock -u root -e "
-          CREATE DATABASE IF NOT EXISTS fundgrow CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+          CREATE DATABASE IF NOT EXISTS anirahadvisory CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
         " 2>/dev/null
         break
       fi
@@ -59,7 +59,7 @@ if ! $MYSQL_HOME/bin/mysql -S $SOCKET_DIR/mysqld.sock -u root -e "SELECT 1" >/de
 fi
 
 # Export DATABASE_URL for Prisma
-export DATABASE_URL="mysql://root:@127.0.0.1:3306/fundgrow"
+export DATABASE_URL="mysql://root:@127.0.0.1:3306/anirahadvisory"
 
 echo "[Next.js] Starting development server..."
 exec next dev -p 3000 2>&1 | tee dev.log

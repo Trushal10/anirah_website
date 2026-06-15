@@ -1,7 +1,22 @@
 import { db } from '../src/lib/db'
+import { hashPassword } from '../src/lib/password'
+
+function enrichSubServiceDescription(name: string, description: string, seriesName: string) {
+  const plainText = description.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+
+  if (description.includes('<p>') && plainText.length >= 220) {
+    return description
+  }
+
+  const intro = description.includes('<')
+    ? description
+    : `<p>${description}</p>`
+
+  return `${intro}<p>Our ${name} service gives founders and MSME owners a complete execution path instead of only basic form filling. The team reviews your business model, current documents, eligibility, timelines, and compliance risks before preparing the application, so the submission is cleaner and easier to track.</p><p>Under the ${seriesName} series, we coordinate documentation, portal filing, follow-ups, corrections, and final handover with practical guidance for what should be done after approval. This helps clients avoid repeated rejections, missed deadlines, and incomplete records while keeping the process transparent from start to finish.</p>`
+}
 
 async function main() {
-  console.log('🌱 Seeding FundGrow database...\n')
+  console.log('🌱 Seeding Anirah Advisory database...\n')
 
   // ─── Clear existing data ───
   console.log('  → Clearing existing data...')
@@ -22,12 +37,12 @@ async function main() {
   // ─── 1. Admin User ───
   console.log('  → Creating admin user...')
   await db.admin.upsert({
-    where: { email: 'admin@fundgrow.in' },
+    where: { email: 'admin@anirahadvisory.in' },
     update: {},
     create: {
-      email: 'admin@fundgrow.in',
-      password: 'admin123',
-      name: 'FundGrow Admin',
+      email: 'admin@anirahadvisory.in',
+      password: hashPassword('admin123'),
+      name: 'Anirah Advisory Admin',
       role: 'admin',
     },
   })
@@ -35,7 +50,7 @@ async function main() {
   // ─── 2. Site Settings ───
   console.log('  → Creating site settings...')
   const settings: Record<string, string> = {
-    company_name: 'FundGrow',
+    company_name: 'Anirah Advisory',
     company_tagline: 'Sada Grow Karo — Buland Sapnon ke Saath',
     company_description:
       "India's trusted MSME funding and business consultancy platform. We empower entrepreneurs and businesses to start, operate, and scale with comprehensive end-to-end solutions.",
@@ -50,13 +65,13 @@ async function main() {
     projects_executed: '500',
     google_reviews: '1950',
     phone2: '+91 9876543210',
-    email2: 'info@fundgrow.in',
-    youtube: 'https://youtube.com/@fundgrow',
-    instagram: 'https://instagram.com/fundgrow',
-    twitter: 'https://x.com/fundgrow',
-    linkedin: 'https://linkedin.com/company/fundgrow',
-    facebook: 'https://facebook.com/fundgrow',
-    hero_title: 'Buland Sapnon ke Saath FundGrow',
+    email2: 'info@anirahadvisory.in',
+    youtube: 'https://youtube.com/@anirahadvisory',
+    instagram: 'https://instagram.com/anirahadvisory',
+    twitter: 'https://x.com/anirahadvisory',
+    linkedin: 'https://linkedin.com/company/anirahadvisory',
+    facebook: 'https://facebook.com/anirahadvisory',
+    hero_title: 'Buland Sapnon ke Saath Anirah Advisory',
     hero_subtitle:
       'Buland Sapnon ke Saath — From registration to funding, we simplify everything for startups, MSMEs, and entrepreneurs across India.',
     hero_badge: 'Trusted by 1,950+ Businesses | Rated 4.7★ on Google',
@@ -67,8 +82,50 @@ async function main() {
     vision:
       'Our vision is to be India\'s most trusted one-stop business consultancy — known for transparency, expertise, and results. We aim to serve 100,000+ businesses by 2030.',
     about_text:
-      'FundGrow is an Ahmedabad-based consultancy committed to empowering businesses with essential services that drive growth. From company registration to compliance, government schemes to grants — we provide comprehensive business solutions under one roof.',
+      'Anirah Advisory is an Ahmedabad-based consultancy committed to empowering businesses with essential services that drive growth. From company registration to compliance, government schemes to grants — we provide comprehensive business solutions under one roof.',
   }
+
+  Object.assign(settings, {
+    company_tagline: 'Empowering Growth, Innovation, Success',
+    company_description:
+      'Anirah Advisory helps startups, MSMEs, and growing businesses with company registration, Startup India recognition, tax exemption, government funding schemes, compliance, branding, website development, and growth advisory.',
+    phone: '+91 9974240114',
+    phone2: '',
+    email: 'hello@anirahadvisory.com',
+    email2: 'sales@anirahadvisory.com',
+    address: 'B-201, Mondeal Heights, Near Panchratna Party Plot, S. G. Highway, Ahmedabad, Gujarat 380015',
+    website: 'https://anirahadvisory.com/',
+    site_url: 'https://anirahadvisory.com/',
+    experience_years: '4',
+    hero_title: 'Start. Scale. Succeed with Anirah Advisory',
+    hero_subtitle:
+      'From Startup India recognition and tax exemption to seed funding, registration, compliance, branding, and digital growth, we help founders build with confidence.',
+    hero_badge: 'Trusted advisory for startups, MSMEs, and entrepreneurs',
+    mission:
+      'Our mission is to empower entrepreneurs with clear, reliable, and affordable advisory support across business registration, compliance, funding, branding, and digital growth.',
+    vision:
+      'Our vision is to become a trusted growth partner for Indian startups and MSMEs by combining practical execution, transparent guidance, and long-term business support.',
+    about_text:
+      'Anirah Advisory is an Ahmedabad-based business consultancy helping founders and MSMEs start, scale, and succeed. We support clients with Startup India certification, company registration, tax exemption, seed funding guidance, compliance, branding, web development, and growth strategy under one roof.',
+    seo_home_title: 'Anirah Advisory | Startup, Funding & Business Growth Consultants',
+    seo_home_description:
+      'Anirah Advisory helps startups and MSMEs with Startup India recognition, seed funding, tax exemption, company registration, compliance, branding, and digital growth.',
+    seo_home_keywords:
+      'Anirah Advisory, Startup India certification, seed funding, company registration, MSME consultant, tax exemption, business growth advisory',
+    seo_about_title: 'About Anirah Advisory | Business Advisory for Startups and MSMEs',
+    seo_about_description:
+      'Learn about Anirah Advisory, an Ahmedabad-based consultancy supporting startups and MSMEs with registration, funding, compliance, branding, and growth.',
+    seo_about_keywords: 'about Anirah Advisory, Ahmedabad business consultant, startup advisory, MSME advisory',
+    seo_career_title: 'Careers at Anirah Advisory | Join Our Advisory Team',
+    seo_career_description:
+      'Explore career opportunities at Anirah Advisory and join a team helping Indian entrepreneurs with startup, funding, compliance, and growth services.',
+    seo_career_keywords: 'Anirah Advisory careers, business consultant jobs, startup advisory jobs, Ahmedabad jobs',
+    seo_contact_title: 'Contact Anirah Advisory | Startup and Business Advisory Support',
+    seo_contact_description:
+      'Contact Anirah Advisory for Startup India recognition, seed funding guidance, company registration, compliance, branding, and business growth consulting.',
+    seo_contact_keywords:
+      'contact Anirah Advisory, startup consultant Ahmedabad, MSME consultant, business advisory contact',
+  })
 
   for (const [key, value] of Object.entries(settings)) {
     await db.siteSetting.upsert({
@@ -827,7 +884,7 @@ async function main() {
         data: {
           name: sub.name,
           slug,
-          description: sub.description,
+          description: enrichSubServiceDescription(sub.name, sub.description, series.name),
           features: JSON.stringify(sub.features),
           benefits: JSON.stringify(sub.benefits || []),
           process: JSON.stringify(sub.process || []),
@@ -1572,7 +1629,7 @@ Every Private Limited Company in India must comply with annual regulatory requir
       company: 'Agarwal Manufacturing Pvt Ltd',
       role: 'Managing Director',
       content:
-        'FundGrow helped us register our manufacturing unit and obtain all necessary certifications including ISO, ZED, and NSIC. Their team is incredibly knowledgeable about government schemes. We also secured a CGTMSE loan through their assistance. Truly a one-stop solution for MSMEs!',
+        'Anirah Advisory helped us register our manufacturing unit and obtain all necessary certifications including ISO, ZED, and NSIC. Their team is incredibly knowledgeable about government schemes. We also secured a CGTMSE loan through their assistance. Truly a one-stop solution for MSMEs!',
       rating: 5,
       order: 1,
     },
@@ -1581,7 +1638,7 @@ Every Private Limited Company in India must comply with annual regulatory requir
       company: 'FreshBite Foods',
       role: 'Founder',
       content:
-        'I was struggling with FSSAI, GST, and Pasara Certificate compliance for my food business in Ahmedabad. FundGrow handled everything end-to-end. They also helped me get registered on GeM, and now I supply to 3 government departments. Their expertise saved me both time and money!',
+        'I was struggling with FSSAI, GST, and Pasara Certificate compliance for my food business in Ahmedabad. Anirah Advisory handled everything end-to-end. They also helped me get registered on GeM, and now I supply to 3 government departments. Their expertise saved me both time and money!',
       rating: 5,
       order: 2,
     },
@@ -1590,7 +1647,7 @@ Every Private Limited Company in India must comply with annual regulatory requir
       company: 'Tariq Enterprises',
       role: 'Proprietor',
       content:
-        'I approached FundGrow for MUDRA Loan assistance. Their team prepared an excellent Financial Deck and helped me navigate the bank loan process. I received ₹8 Lakh within 2 weeks! Their knowledge of government loan schemes is unmatched. Highly recommended for small business owners.',
+        'I approached Anirah Advisory for MUDRA Loan assistance. Their team prepared an excellent Financial Deck and helped me navigate the bank loan process. I received ₹8 Lakh within 2 weeks! Their knowledge of government loan schemes is unmatched. Highly recommended for small business owners.',
       rating: 5,
       order: 3,
     },
@@ -1599,7 +1656,7 @@ Every Private Limited Company in India must comply with annual regulatory requir
       company: 'GreenTech Innovations',
       role: 'Co-Founder',
       content:
-        'FundGrow helped us get Startup India certification and also connected us with NIDHI Prayas for our prototype funding. The Investor Deck they prepared helped us secure our first round of angel investment. Their branding services under VISTAR series are top-notch. Great team, great results!',
+        'Anirah Advisory helped us get Startup India certification and also connected us with NIDHI Prayas for our prototype funding. The Investor Deck they prepared helped us secure our first round of angel investment. Their branding services under VISTAR series are top-notch. Great team, great results!',
       rating: 4,
       order: 4,
     },
@@ -1615,14 +1672,14 @@ Every Private Limited Company in India must comply with annual regulatory requir
     {
       name: 'Hitesh Shah',
       role: 'Founder & CEO',
-      bio: 'With over 25 years of experience in business consultancy, Hitesh leads FundGrow with a vision to make entrepreneurship accessible to every Indian. He has helped 2,000+ businesses get established.',
+      bio: 'With over 25 years of experience in business consultancy, Hitesh leads Anirah Advisory with a vision to make entrepreneurship accessible to every Indian. He has helped 2,000+ businesses get established.',
       linkedin: 'https://linkedin.com/in/hitesh-shah',
       order: 1,
     },
     {
       name: 'Anjali Patel',
       role: 'Head of Operations',
-      bio: 'Anjali oversees all service delivery at FundGrow. With an MBA from IIM-A and 15 years in consulting, she ensures every client receives seamless and efficient service.',
+      bio: 'Anjali oversees all service delivery at Anirah Advisory. With an MBA from IIM-A and 15 years in consulting, she ensures every client receives seamless and efficient service.',
       linkedin: 'https://linkedin.com/in/anjali-patel',
       order: 2,
     },
@@ -1636,21 +1693,21 @@ Every Private Limited Company in India must comply with annual regulatory requir
     {
       name: 'Sneha Verma',
       role: 'Chartered Accountant',
-      bio: 'Sneha leads the taxation and compliance team at FundGrow. She specializes in GST, income tax, and corporate compliance with a track record of serving 500+ clients.',
+      bio: 'Sneha leads the taxation and compliance team at Anirah Advisory. She specializes in GST, income tax, and corporate compliance with a track record of serving 500+ clients.',
       linkedin: 'https://linkedin.com/in/sneha-verma',
       order: 4,
     },
     {
       name: 'Karan Mehta',
       role: 'Business Development Head',
-      bio: 'Karan drives FundGrow\'s growth strategy and client acquisition. His deep understanding of the MSME ecosystem and strong network have been instrumental in FundGrow\'s expansion.',
+      bio: 'Karan drives Anirah Advisory\'s growth strategy and client acquisition. His deep understanding of the MSME ecosystem and strong network have been instrumental in Anirah Advisory\'s expansion.',
       linkedin: 'https://linkedin.com/in/karan-mehta',
       order: 5,
     },
     {
       name: 'Pooja Reddy',
       role: 'Digital Marketing Manager',
-      bio: 'Pooja manages FundGrow\'s online presence and lead generation. With expertise in SEO, content marketing, and paid campaigns, she ensures FundGrow reaches the right audience.',
+      bio: 'Pooja manages Anirah Advisory\'s online presence and lead generation. With expertise in SEO, content marketing, and paid campaigns, she ensures Anirah Advisory reaches the right audience.',
       linkedin: 'https://linkedin.com/in/pooja-reddy',
       order: 6,
     },
@@ -1664,16 +1721,16 @@ Every Private Limited Company in India must comply with annual regulatory requir
   console.log('  → Creating FAQs...')
   const faqs = [
     {
-      question: 'What services does FundGrow offer for new businesses?',
+      question: 'What services does Anirah Advisory offer for new businesses?',
       answer:
-        'FundGrow offers comprehensive end-to-end business solutions under 7 service series: AARAMBH (Registration), KAVACH (Legal & IP Protection), PRAMANIT (Certifications), NIDHI (Grants & Funding), VIKAS (Funding & Loans), VISTAR (Branding & Growth), and PRABANDHIT (Compliance). Whether you need company registration, government certifications, business loans, or annual compliance — we handle everything under one roof.',
+        'Anirah Advisory offers comprehensive end-to-end business solutions under 7 service series: AARAMBH (Registration), KAVACH (Legal & IP Protection), PRAMANIT (Certifications), NIDHI (Grants & Funding), VIKAS (Funding & Loans), VISTAR (Branding & Growth), and PRABANDHIT (Compliance). Whether you need company registration, government certifications, business loans, or annual compliance — we handle everything under one roof.',
       category: 'General',
       order: 1,
     },
     {
       question: 'How long does it take to register a Private Limited Company?',
       answer:
-        'With FundGrow, the entire registration process takes 7-10 business days. This includes obtaining DSC, DIN, name reservation, and filing the incorporation forms through SPICe+. We ensure the fastest possible turnaround and handle all paperwork on your behalf.',
+        'With Anirah Advisory, the entire registration process takes 7-10 business days. This includes obtaining DSC, DIN, name reservation, and filing the incorporation forms through SPICe+. We ensure the fastest possible turnaround and handle all paperwork on your behalf.',
       category: 'Registration',
       order: 2,
     },
@@ -1687,21 +1744,21 @@ Every Private Limited Company in India must comply with annual regulatory requir
     {
       question: 'What government grants are available for MSMEs in India?',
       answer:
-        'Several government grants are available: Seed Fund Scheme (up to ₹50 Lakh), NIDHI-PRAYAS (up to ₹10 Lakh for prototypes), TIDE (up to ₹50 Lakh for tech startups), PMEGP (subsidy up to 35%), PMFME (credit-linked subsidy for food processing), and CGTMSE (collateral-free loans up to ₹2 Crore). FundGrow helps identify the best scheme for your business and handles the entire application process.',
+        'Several government grants are available: Seed Fund Scheme (up to ₹50 Lakh), NIDHI-PRAYAS (up to ₹10 Lakh for prototypes), TIDE (up to ₹50 Lakh for tech startups), PMEGP (subsidy up to 35%), PMFME (credit-linked subsidy for food processing), and CGTMSE (collateral-free loans up to ₹2 Crore). Anirah Advisory helps identify the best scheme for your business and handles the entire application process.',
       category: 'Funding',
       order: 4,
     },
     {
       question: 'How can I get a collateral-free business loan?',
       answer:
-        'You can get a collateral-free business loan under the CGTMSE scheme (up to ₹2 Crore) or MUDRA Loan (up to ₹10 Lakh). FundGrow helps you with documentation, Financial Deck preparation, loan application, and bank coordination. Our success rate for loan approvals is over 85%, and we have relationships with 15+ banks and NBFCs.',
+        'You can get a collateral-free business loan under the CGTMSE scheme (up to ₹2 Crore) or MUDRA Loan (up to ₹10 Lakh). Anirah Advisory helps you with documentation, Financial Deck preparation, loan application, and bank coordination. Our success rate for loan approvals is over 85%, and we have relationships with 15+ banks and NBFCs.',
       category: 'Funding',
       order: 5,
     },
     {
       question: 'What are the annual compliance requirements for a Private Limited Company?',
       answer:
-        'A Private Limited Company must file: AOC-4 (financial statements) within 30 days of AGM, MGT-7 (annual return) within 60 days of AGM, ADT-1 (auditor appointment) within 15 days of AGM, DIR-3 KYC for all directors annually, and income tax return by October 31st. FundGrow offers comprehensive annual compliance packages starting from ₹2,999 under our PRABANDHIT series.',
+        'A Private Limited Company must file: AOC-4 (financial statements) within 30 days of AGM, MGT-7 (annual return) within 60 days of AGM, ADT-1 (auditor appointment) within 15 days of AGM, DIR-3 KYC for all directors annually, and income tax return by October 31st. Anirah Advisory offers comprehensive annual compliance packages starting from ₹2,999 under our PRABANDHIT series.',
       category: 'Compliance',
       order: 6,
     },
@@ -1715,7 +1772,7 @@ Every Private Limited Company in India must comply with annual regulatory requir
     {
       question: 'What certifications should my MSME have to grow faster?',
       answer:
-        'Key certifications for MSME growth include: Udyam Registration (mandatory for benefits), Startup India Certification (for tax exemption), ISO Certificate (for quality credibility), GeM Registration (for government sales), NSIC Registration (for tenders), and ZED Certificate (for quality manufacturing). FundGrow handles all these under our PRAMANIT series with expert guidance.',
+        'Key certifications for MSME growth include: Udyam Registration (mandatory for benefits), Startup India Certification (for tax exemption), ISO Certificate (for quality credibility), GeM Registration (for government sales), NSIC Registration (for tenders), and ZED Certificate (for quality manufacturing). Anirah Advisory handles all these under our PRAMANIT series with expert guidance.',
       category: 'Services',
       order: 8,
     },

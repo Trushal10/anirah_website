@@ -205,10 +205,10 @@ export default function ServiceDetailPage() {
       {/* ═══════════════════════════════════════
           SECTION 1: Hero
           ═══════════════════════════════════════ */}
-      <section className="relative overflow-hidden" style={{ backgroundColor: '#010000' }}>
-        <div className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl opacity-20" style={{ backgroundColor: accent }} />
-        <div className="absolute bottom-0 left-0 w-72 h-72 rounded-full blur-3xl opacity-10" style={{ backgroundColor: '#16A34A' }} />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+      <section className="relative overflow-hidden bg-gray-950">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(240,179,84,0.18),transparent_30%),radial-gradient(circle_at_84%_14%,rgba(22,163,74,0.14),transparent_28%)]" />
+        <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,.8)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.8)_1px,transparent_1px)] [background-size:48px_48px]" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-24">
           <FadeIn>
             {/* Back button */}
             <button
@@ -218,7 +218,7 @@ export default function ServiceDetailPage() {
               <ArrowLeft className="w-4 h-4" /> Back to All Services
             </button>
 
-            <div className="grid lg:grid-cols-2 gap-10 items-start">
+            <div className="grid lg:grid-cols-[1.05fr_.95fr] gap-10 items-start">
               <div>
                 {/* Series Badge */}
                 <Badge className="mb-5 px-4 py-1.5 text-sm font-semibold" style={{ backgroundColor: `${accent}25`, color: accent, border: `1px solid ${accent}40` }}>
@@ -226,22 +226,21 @@ export default function ServiceDetailPage() {
                 </Badge>
 
                 {/* Title with icon */}
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ backgroundColor: `${accent}25` }}>
+                <div className="flex flex-col gap-4 mb-5 sm:flex-row sm:items-center">
+                  <div className="w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center" style={{ backgroundColor: `${accent}25` }}>
                     <ServiceIcon icon={service.icon} accentColor={accent} className="w-7 h-7" alt={service.name} />
                   </div>
-                  <h1 className="text-3xl lg:text-5xl font-bold text-white">{service.name}</h1>
+                  <h1 className="text-3xl lg:text-5xl font-bold leading-tight text-white">{service.name}</h1>
                 </div>
 
                 {/* Description */}
                 <p className="text-lg text-gray-300 leading-relaxed mb-8 max-w-xl">{richTextToPlainText(service.description)}</p>
 
                 {/* CTA Buttons */}
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <Button
                     onClick={() => navigate('contact')}
-                    className="rounded-xl shadow-lg hover:shadow-xl transition-all"
-                    style={{ backgroundColor: accent, color: accentText }}
+                    className="primary-action"
                     size="lg"
                   >
                     Get Free Consultation <ArrowRight className="w-4 h-4 ml-2" />
@@ -249,7 +248,7 @@ export default function ServiceDetailPage() {
                   {phone && (
                     <Button
                       variant="outline"
-                      className="border-white/20 text-white hover:bg-white/10 rounded-xl"
+                      className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white rounded-xl"
                       size="lg"
                       asChild
                     >
@@ -262,26 +261,26 @@ export default function ServiceDetailPage() {
               </div>
 
               {/* Right - Stats cards */}
-              <div className="grid grid-cols-2 gap-4">
-                <Card className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                <Card className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
                   <CardContent className="p-5 text-center">
                     <p className="text-3xl font-bold text-white">{service.subservices.length}+</p>
                     <p className="text-xs text-gray-400 mt-1">Services</p>
                   </CardContent>
                 </Card>
-                <Card className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl">
+                <Card className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
                   <CardContent className="p-5 text-center">
                     <p className="text-3xl font-bold text-white">95%</p>
                     <p className="text-xs text-gray-400 mt-1">Success Rate</p>
                   </CardContent>
                 </Card>
-                <Card className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl">
+                <Card className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
                   <CardContent className="p-5 text-center">
                     <p className="text-3xl font-bold text-white">24hr</p>
                     <p className="text-xs text-gray-400 mt-1">Response Time</p>
                   </CardContent>
                 </Card>
-                <Card className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl">
+                <Card className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
                   <CardContent className="p-5 text-center">
                     <p className="text-3xl font-bold text-white">500+</p>
                     <p className="text-xs text-gray-400 mt-1">Projects Done</p>
@@ -326,11 +325,11 @@ export default function ServiceDetailPage() {
       {/* ═══════════════════════════════════════
           SECTION 3: Sub-Services Overview (3-column cards)
           ═══════════════════════════════════════ */}
-      <section className="py-16 lg:py-20">
+      <section className="section-pad bg-gray-50/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn>
             <div className="text-center mb-12">
-              <Badge variant="secondary" className="mb-3">Our Solutions</Badge>
+              <span className="section-kicker mb-3">Our Solutions</span>
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
                 Comprehensive {service.name} Solutions
               </h2>
@@ -344,7 +343,7 @@ export default function ServiceDetailPage() {
               <FadeIn key={sub.id} delay={i * 0.05}>
                 <Card
                   onClick={() => navigate('subservice-detail', sub.slug)}
-                  className="cursor-pointer group rounded-2xl border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full bg-white overflow-hidden"
+                  className="group h-full cursor-pointer overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-300 hover:-translate-y-0.5 hover:border-mint-200 hover:shadow-lg hover:shadow-black/5"
                 >
                   <CardContent className="p-6">
                     {/* Numbered badge */}
@@ -396,46 +395,51 @@ export default function ServiceDetailPage() {
       {/* ═══════════════════════════════════════
           SECTION 4: All Sub-Services (numbered list)
           ═══════════════════════════════════════ */}
-      <section className="py-16 lg:py-20 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="section-pad bg-white">
+        <div className="section-shell">
           <FadeIn>
-            <div className="text-center mb-12">
-              <Badge variant="secondary" className="mb-3">Complete List</Badge>
+            <div className="mx-auto mb-12 max-w-3xl text-center">
+              <span className="section-kicker mb-3">Complete List</span>
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
                 All {service.name} Services
               </h2>
+              <p className="text-gray-500">
+                Pick the exact service you need. Each item opens a detailed page with documents, process, and eligibility.
+              </p>
             </div>
           </FadeIn>
-          <div className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
             {service.subservices.map((sub, i) => (
               <FadeIn key={sub.id} delay={i * 0.05}>
-                <div
+                <button
                   onClick={() => navigate('subservice-detail', sub.slug)}
-                  className="flex items-start gap-4 p-5 rounded-xl bg-white border border-gray-100 hover:shadow-md hover:border-l-4 transition-all cursor-pointer"
-                  style={{ borderLeftColor: accent }}
+                  className="group flex h-full w-full items-start gap-4 rounded-2xl border border-gray-200 bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-mint-200 hover:shadow-lg hover:shadow-black/5"
                 >
                   <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
+                    className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl text-sm font-bold"
                     style={{ backgroundColor: accent, color: accentText }}
                   >
-                    {i + 1}
+                    {String(i + 1).padStart(2, '0')}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-gray-900">{sub.name}</h3>
+                    <div className="mb-2 flex flex-wrap items-center gap-2">
+                      <h3 className="font-bold text-gray-950 transition group-hover:text-mint-700">{sub.name}</h3>
                       {sub.registrationTime && (
-                        <Badge variant="outline" className="text-xs px-2 py-0">
+                        <Badge variant="outline" className="rounded-full px-2 py-0 text-xs">
                           <Clock className="w-3 h-3 mr-1" />
                           {sub.registrationTime}
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-gray-500 line-clamp-2">
+                    <p className="line-clamp-2 text-sm leading-relaxed text-gray-500">
                       {richTextToPlainText(sub.description)}
                     </p>
+                    <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-mint-700">
+                      View details
+                      <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" />
+                    </span>
                   </div>
-                  <ArrowRight className="w-4 h-4 mt-1 flex-shrink-0 text-gray-400" />
-                </div>
+                </button>
               </FadeIn>
             ))}
           </div>
@@ -449,7 +453,7 @@ export default function ServiceDetailPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn>
             <div className="text-center mb-12">
-              <Badge variant="secondary" className="mb-3">Why Choose Us</Badge>
+              <span className="section-kicker mb-3">Why Choose Us</span>
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
                 Key Benefits of {service.name}
               </h2>
@@ -462,7 +466,7 @@ export default function ServiceDetailPage() {
             {allBenefits.length > 0
               ? allBenefits.slice(0, 6).map((benefit, i) => (
                   <FadeIn key={i} delay={i * 0.05}>
-                    <Card className="rounded-xl border-0 shadow-sm bg-white h-full hover:shadow-md transition-shadow">
+                    <Card className="h-full rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
                       <CardContent className="p-6">
                         {(() => {
                           const BenefitIcon = benefitIcons[i % benefitIcons.length]
@@ -483,7 +487,7 @@ export default function ServiceDetailPage() {
                   { icon: Zap, title: 'Digital Process', desc: '100% online process with real-time tracking' },
                 ].map((b, i) => (
                   <FadeIn key={i} delay={i * 0.05}>
-                    <Card className="rounded-xl border-0 shadow-sm bg-white h-full hover:shadow-md transition-shadow">
+                    <Card className="h-full rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
                       <CardContent className="p-6">
                         <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: `${accent}15` }}>
                           <b.icon className="w-5 h-5" style={{ color: accent }} />
@@ -501,34 +505,40 @@ export default function ServiceDetailPage() {
       {/* ═══════════════════════════════════════
           SECTION 6: How We Work
           ═══════════════════════════════════════ */}
-      <section className="py-16 lg:py-20 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="section-pad bg-gray-50/80">
+        <div className="section-shell">
           <FadeIn>
-            <div className="text-center mb-12">
-              <Badge variant="secondary" className="mb-3">Our Process</Badge>
+            <div className="mx-auto mb-12 max-w-3xl text-center">
+              <span className="section-kicker mb-3">Our Process</span>
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">How We Work</h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
                 A simple and transparent process for all our {service.name} services.
               </p>
             </div>
           </FadeIn>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid gap-4 lg:grid-cols-4">
             {[
-              { step: 1, title: 'Consultation', desc: 'We discuss your requirements and recommend the best service for your business needs.' },
-              { step: 2, title: 'Document Collection', desc: 'Our team helps you gather and organize all required documents for the application.' },
-              { step: 3, title: 'Application Filing', desc: 'We prepare and submit the application with all supporting documents to the authority.' },
-              { step: 4, title: 'Approval & Delivery', desc: 'Track the status and receive your certificate or approval upon completion.' },
+              { step: 1, icon: Phone, title: 'Consultation', desc: 'We understand your requirement and suggest the right service path.' },
+              { step: 2, icon: FileText, title: 'Documents', desc: 'Our team shares a clear checklist and helps organize required papers.' },
+              { step: 3, icon: ClipboardList, title: 'Filing', desc: 'We prepare, review, and submit the application with supporting details.' },
+              { step: 4, icon: Award, title: 'Delivery', desc: 'You receive status updates until certificate, approval, or completion.' },
             ].map((item, i) => (
               <FadeIn key={i} delay={i * 0.1}>
-                <div className="text-center">
+                <div className="relative h-full rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                  {i < 3 && (
+                    <div className="absolute left-[calc(100%-0.5rem)] top-10 hidden h-px w-8 bg-gray-200 lg:block" />
+                  )}
                   <div
-                    className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4 shadow-lg"
+                    className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl text-sm font-bold"
                     style={{ backgroundColor: accent, color: accentText }}
                   >
-                    {item.step}
+                    <item.icon className="h-5 w-5" />
                   </div>
-                  <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+                  <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    Step {item.step}
+                  </span>
+                  <h3 className="mb-2 font-bold text-gray-950">{item.title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-500">{item.desc}</p>
                 </div>
               </FadeIn>
             ))}
@@ -544,7 +554,7 @@ export default function ServiceDetailPage() {
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <FadeIn>
               <div className="text-center mb-12">
-                <Badge variant="secondary" className="mb-3">FAQs</Badge>
+                <span className="section-kicker mb-3">FAQs</span>
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
               </div>
             </FadeIn>
@@ -573,9 +583,7 @@ export default function ServiceDetailPage() {
       {/* ═══════════════════════════════════════
           SECTION 8: CTA - Ready to Get Started
           ═══════════════════════════════════════ */}
-      <section className="py-16 lg:py-20 relative overflow-hidden bg-gray-950">
-        <div className="absolute top-0 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
+      <section className="section-pad relative overflow-hidden bg-gray-950">
         <div className="relative max-w-4xl mx-auto px-4 text-center">
           <FadeIn>
             <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center mx-auto mb-6">
@@ -590,8 +598,7 @@ export default function ServiceDetailPage() {
             <div className="flex flex-wrap justify-center gap-4">
               <Button
                 size="lg"
-                className="bg-white hover:bg-gray-100 rounded-xl shadow-lg font-semibold"
-                style={{ color: accent }}
+                className="primary-action"
                 onClick={() => navigate('contact')}
               >
                 Get Free Consultation <ArrowRight className="w-4 h-4 ml-2" />
@@ -600,7 +607,7 @@ export default function ServiceDetailPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-white/30 text-white hover:bg-white/10 rounded-xl"
+                  className="border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white rounded-xl"
                   asChild
                 >
                   <a href={`tel:${phone}`}>
@@ -621,7 +628,7 @@ export default function ServiceDetailPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <FadeIn>
               <div className="text-center mb-12">
-                <Badge variant="secondary" className="mb-3">Explore More</Badge>
+                <span className="section-kicker mb-3">Explore More</span>
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Other Services</h2>
                 <p className="text-gray-500 max-w-2xl mx-auto">
                   Discover our comprehensive range of business services.

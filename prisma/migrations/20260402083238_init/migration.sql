@@ -47,10 +47,10 @@ CREATE TABLE `SubService` (
     `name` VARCHAR(255) NOT NULL,
     `slug` VARCHAR(255) NOT NULL,
     `description` TEXT NOT NULL,
-    `benefits` TEXT NOT NULL
+    `benefits` TEXT NOT NULL,
     `process` TEXT NOT NULL,
     `documents` TEXT NOT NULL,
-    `eligibility` TEXT NOT NULL DEFAULT '',
+    `eligibility` TEXT NOT NULL,
     `features` TEXT NOT NULL,
     `pricing` VARCHAR(255) NULL,
     `referenceLink` VARCHAR(500) NULL,

@@ -29,6 +29,7 @@ import { publicAccent } from '@/lib/public-palette'
 const navLinks = [
   { label: 'Home', page: 'home' as const },
   { label: 'Services', page: 'services' as const, hasDropdown: true },
+  { label: 'Schemes', page: 'government-schemes' as const },
   { label: 'About Us', page: 'about' as const },
   { label: 'Blog', page: 'blog' as const },
   { label: 'Career', page: 'career' as const },
@@ -84,6 +85,7 @@ function CheckCircleFallback(props: { className?: string }) {
 export default function Header() {
   const { settings, navigate, currentPage } = useAppStore()
   const [scrolled, setScrolled] = useState(false)
+  const [failedLogo, setFailedLogo] = useState('')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [servicesOpen, setServicesOpen] = useState(false)
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false)
@@ -101,9 +103,11 @@ export default function Header() {
       .catch(() => {})
   }, [])
 
-  const companyName = settings.company_name || 'FundGrow'
+  const companyName = settings.company_name || 'Anirah Advisory'
   const phone = settings.phone || '+91 9998006734'
   const companyLogo = settings.company_logo || ''
+  const logoFailed = Boolean(companyLogo && failedLogo === companyLogo)
+  const settingsLoaded = Object.keys(settings).length > 0
 
   const handleNav = (page: string) => {
     navigate(page as any)
@@ -163,15 +167,18 @@ export default function Header() {
               onClick={() => handleNav('home')}
               className="flex items-center group min-w-0"
             >
-              {companyLogo ? (
+              {companyLogo && !logoFailed ? (
                 <img
                   src={companyLogo}
                   alt={companyName}
-                  className="h-10 w-auto max-w-[160px] shrink-0 object-contain"
+                  className="h-[64px] w-auto max-w-[190px] shrink-0 object-contain"
+                  onError={() => setFailedLogo(companyLogo)}
                 />
+              ) : !settingsLoaded ? (
+                <div className="h-12 w-[150px] rounded-lg bg-gray-100" aria-label="Loading logo" />
               ) : (
-                <div className="brand-gradient w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-brand-400/20 group-hover:shadow-brand-400/40 transition-shadow">
-                  <span className="text-white font-bold text-sm">FG</span>
+                <div className="brand-gradient h-11 w-11 rounded-xl flex items-center justify-center shadow-lg shadow-brand-400/20 group-hover:shadow-brand-400/40 transition-shadow">
+                  <span className="text-white font-bold text-sm">AA</span>
                 </div>
               )}
             </button>
@@ -267,7 +274,7 @@ export default function Header() {
               <Button
                 onClick={() => handleNav('contact')}
                 size="sm"
-                className="hidden sm:flex brand-gradient text-white font-bold rounded-lg shadow-lg shadow-brand-400/20 transition-all"
+                className="primary-action !hidden !h-auto !px-6 !py-3 lg:!inline-flex"
               >
                 Start Funding Journey
                 <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
@@ -286,11 +293,18 @@ export default function Header() {
                   {/* Mobile Header */}
                   <div className="p-6 border-b border-gray-100 brand-gradient-soft">
                     <div className="flex items-center gap-2.5">
-                      {companyLogo ? (
-                        <img src={companyLogo} alt={companyName} className="h-10 w-auto max-w-[120px] object-contain" />
+                      {companyLogo && !logoFailed ? (
+                        <img
+                          src={companyLogo}
+                          alt={companyName}
+                          className="h-12 w-auto max-w-[160px] object-contain"
+                          onError={() => setFailedLogo(companyLogo)}
+                        />
+                      ) : !settingsLoaded ? (
+                        <div className="h-12 w-[130px] rounded-lg bg-white/60" aria-label="Loading logo" />
                       ) : (
-                        <div className="brand-gradient w-9 h-9 rounded-xl flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">FG</span>
+                        <div className="brand-gradient h-10 w-10 rounded-xl flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">AA</span>
                         </div>
                       )}
                     </div>
@@ -355,7 +369,7 @@ export default function Header() {
                   <div className="p-4 mt-auto border-t border-gray-100">
                     <Button
                       onClick={() => handleNav('contact')}
-                      className="w-full brand-gradient text-white font-bold rounded-lg"
+                      className="primary-action w-full !h-auto !px-6 !py-3"
                     >
                       Start Funding Journey
                       <ArrowRight className="w-4 h-4 ml-2" />

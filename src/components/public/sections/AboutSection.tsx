@@ -16,7 +16,7 @@ type Props = {
 };
 
 export default function AboutSection({ settings }: Props) {
-  const aboutContent = settings?.about_text || "FundGrow helps entrepreneurs and MSMEs start, operate, and scale with reliable registration, compliance, certification, and funding support.";
+  const aboutContent = settings?.about_text || "Anirah Advisory helps entrepreneurs and MSMEs start, operate, and scale with reliable registration, compliance, certification, and funding support.";
   const aboutMission = settings?.mission || 'To make high-quality business consultancy accessible, transparent, and practical for growing Indian businesses.';
   const aboutVision = settings?.vision || "To become India's most trusted business growth partner for startups, MSMEs, and established enterprises.";
 
@@ -25,7 +25,7 @@ export default function AboutSection({ settings }: Props) {
       <div className="section-shell">
         <div className="mb-14 grid items-center gap-10 lg:mb-16 lg:grid-cols-2 lg:gap-14">
           <ScrollAnimation direction="left">
-            <span className="section-kicker mb-4">About FundGrow</span>
+            <span className="section-kicker mb-4">About Anirah Advisory</span>
             <h2 className="section-heading mb-5">
               We are on a mission to <span className="text-brand-600">grow every business</span>
             </h2>

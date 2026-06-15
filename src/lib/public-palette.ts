@@ -1,4 +1,4 @@
-const publicAccents = ['#E8A23E', '#16A34A']
+const publicAccents = ['#2D2D2D', '#F9B65B', '#16A34A']
 
 export function publicAccent(seed?: string | null, index = 0) {
   const value = seed || ''
@@ -7,8 +7,9 @@ export function publicAccent(seed?: string | null, index = 0) {
 }
 
 export const publicGreen = '#16A34A'
-export const publicYellow = '#E8A23E'
+export const publicYellow = '#F9B65B'
+export const publicBlack = '#2D2D2D'
 
 export function publicAccentForeground(accent: string) {
-  return accent.toLowerCase() === publicGreen.toLowerCase() ? '#ffffff' : '#050505'
+  return accent.toLowerCase() === publicYellow.toLowerCase() ? '#050505' : '#ffffff'
 }

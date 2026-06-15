@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast'
 import FileUpload from '@/components/admin/FileUpload'
 import { ScrollAnimation, StaggerContainer, StaggerItem } from '@/components/ui/ScrollAnimation';
 import PageHero from '@/components/common/PageHero'
+import TurnstileWidget from '@/components/common/TurnstileWidget'
 
 function FadeIn({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null)
@@ -73,6 +74,8 @@ export default function CareerPage() {
   const [applyDialogOpen, setApplyDialogOpen] = useState(false)
   const [selectedJob, setSelectedJob] = useState<Career | null>(null)
   const [applyForm, setApplyForm] = useState({ name: '', email: '', phone: '', experience: '', resumeUrl: '', message: '' })
+  const [applyFormStartedAt, setApplyFormStartedAt] = useState(Date.now())
+  const [turnstileToken, setTurnstileToken] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [filePreview, setFilePreview] = useState<string | null>(null)
 
@@ -86,6 +89,8 @@ export default function CareerPage() {
   const openApply = (job: Career) => {
     setSelectedJob(job)
     setApplyForm({ name: '', email: '', phone: '', experience: '', resumeUrl: '', message: '' })
+    setApplyFormStartedAt(Date.now())
+    setTurnstileToken('')
     setFilePreview(null)
     setApplyDialogOpen(true)
   }
@@ -113,7 +118,7 @@ export default function CareerPage() {
     }
     setSubmitting(true)
     try {
-      await fetch('/api/contact', {
+      const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -121,12 +126,24 @@ export default function CareerPage() {
           subject: `Job Application: ${selectedJob?.title}`,
           businessType: selectedJob?.department,
           inquiryType: 'career',
+          website: '',
+          formStartedAt: applyFormStartedAt,
+          turnstileToken,
         }),
       })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Failed to submit application')
+      }
       toast({ title: 'Application Submitted!', description: `We'll review your application for ${selectedJob?.title}.` })
       setApplyDialogOpen(false)
-    } catch {
-      toast({ title: 'Error', description: 'Something went wrong.', variant: 'destructive' })
+      setTurnstileToken('')
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Something went wrong.',
+        variant: 'destructive',
+      })
     }
     setSubmitting(false)
   }
@@ -154,7 +171,7 @@ export default function CareerPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <ScrollAnimation className="text-center mb-14">
             <span className="inline-block px-4 py-1.5 rounded-full bg-brand-50 text-brand-700 text-sm font-semibold mb-4">
-              Why FundGrow
+              Why Anirah Advisory
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
               Why Join{' '}
@@ -250,7 +267,7 @@ export default function CareerPage() {
                         {/* Apply Button */}
                         <button
                           onClick={() => openApply(job)}
-                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-brand-500 to-mint-600 text-white font-semibold text-sm shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 hover:scale-105 transition-all whitespace-nowrap self-start"
+                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[#F0B354] bg-[#F0B354] text-black font-semibold text-sm shadow-none hover:border-[#E4A13A] hover:bg-[#E4A13A] hover:text-black hover:shadow-none hover:scale-105 transition-all whitespace-nowrap self-start"
                         >
                           Apply Now
                           <ArrowRight className="w-4 h-4" />
@@ -288,7 +305,7 @@ export default function CareerPage() {
               </p>
               <p className="text-gray-400 text-sm mt-2">
                 Check back soon or send us your resume at{" "}
-                {settings.email || "careers@fundgrow.in"}
+                {settings.email || "careers@anirahadvisory.in"}
               </p>
             </div>
           )}
@@ -355,7 +372,8 @@ export default function CareerPage() {
             </div>
 
             <div><label className="text-sm font-medium text-gray-700 mb-1.5 block">Message</label><Textarea value={applyForm.message} onChange={(e) => setApplyForm({ ...applyForm, message: e.target.value })} placeholder="Tell us about yourself..." rows={3} className="rounded-lg" /></div>
-            <Button onClick={submitApplication} disabled={submitting} className="w-full bg-gradient-to-r from-brand-500 to-mint-600 text-white font-bold rounded-lg">
+            <TurnstileWidget onVerify={setTurnstileToken} onExpire={() => setTurnstileToken('')} />
+            <Button onClick={submitApplication} disabled={submitting} className="w-full rounded-xl border border-[#F0B354] bg-[#F0B354] font-bold text-black shadow-none hover:border-[#E4A13A] hover:bg-[#E4A13A] hover:text-black hover:shadow-none">
               {submitting ? 'Submitting...' : 'Submit Application'} <Send className="w-4 h-4 ml-2" />
             </Button>
           </div>

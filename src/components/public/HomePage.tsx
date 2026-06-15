@@ -52,7 +52,7 @@ interface Service { id: string; name: string; slug: string; icon: string; taglin
 interface Testimonial { id: string; name: string; company: string | null; role: string | null; content: string; rating: number; avatarUrl?: string | null }
 interface FAQItem { id: string; question: string; answer: string; category: string }
 interface BlogPost { id: string; title: string; slug: string; excerpt: string; coverImage?: string | null; category: string; readTime: string; createdAt: string }
-interface Scheme { id: string; title: string; slug: string; description: string; category: string; image?: string | null; benefits: string; eligibility: string }
+interface Scheme { id: string; title: string; slug: string; summary?: string | null; description: string; category: string; image?: string | null; benefits: string; eligibility: string }
 
 /* ─── Icon Map for Services ─── */
 const iconMap: Record<string, React.ElementType> = {
@@ -76,15 +76,15 @@ export default function HomePage() {
       fetch('/api/testimonials').then((r) => r.json()),
       fetch('/api/faqs').then((r) => r.json()),
       fetch('/api/schemes').then((r) => r.json()),
-      fetch('/api/blog?limit=3').then((r) => r.json()),
+      fetch('/api/blog?limit=6').then((r) => r.json()),
     ]).then(([s, sv, t, f, sc, bl]) => {
       // setStats(s || [])
-      setServices(sv || [])
+      setServices(Array.isArray(sv) ? sv.slice(0, 9) : [])
       setTestimonials(t || [])
       setFaqs(f || [])
-      setSchemes(sc || [])
+      setSchemes(Array.isArray(sc) ? sc.slice(0, 6) : [])
       const blogData = bl?.posts || bl || []
-      setBlogs(Array.isArray(blogData) ? blogData : [])
+      setBlogs(Array.isArray(blogData) ? blogData.slice(0, 6) : [])
     }).catch(() => {})
   }, [])
 

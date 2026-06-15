@@ -4,7 +4,8 @@ import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react'
+import { Upload, X, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface ImageUploadProps {
   value: string
@@ -23,13 +24,15 @@ export default function ImageUpload({ value, onChange, label = 'Image', folder =
 
     // Validate type
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file')
+      toast.error('Please select an image file')
+      e.target.value = ''
       return
     }
 
     // Validate size (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('Image must be less than 5MB')
+      toast.error('Image must be less than 5MB')
+      e.target.value = ''
       return
     }
 
@@ -48,9 +51,10 @@ export default function ImageUpload({ value, onChange, label = 'Image', folder =
 
       onChange(data.url)
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Upload failed')
+      toast.error(err instanceof Error ? err.message : 'Upload failed')
     } finally {
       setUploading(false)
+      e.target.value = ''
     }
   }
 

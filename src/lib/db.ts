@@ -10,7 +10,7 @@ export const db =
     log: ['error', 'warn'],
     datasources: {
       db: {
-        url: process.env.DATABASE_URL || 'mysql://root:@127.0.0.1:3306/fundgrow',
+        url: process.env.DATABASE_URL || 'mysql://root:@127.0.0.1:3306/anirahadvisory',
       },
     },
   })

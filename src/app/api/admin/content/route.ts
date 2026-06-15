@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { title, slug, excerpt, content, coverImage, category, readTime, isPublished, isFeatured } = body
+    const { title, slug, excerpt, content, seoTitle, seoDescription, seoKeywords, coverImage, category, readTime, isPublished, isFeatured } = body
 
     if (!title || !slug || !excerpt || !content || !category) {
       return NextResponse.json(
@@ -41,6 +41,9 @@ export async function POST(req: NextRequest) {
         slug,
         excerpt,
         content,
+        seoTitle: seoTitle || null,
+        seoDescription: seoDescription || null,
+        seoKeywords: seoKeywords || null,
         coverImage: coverImage || null,
         category,
         readTime: readTime || '5 min read',

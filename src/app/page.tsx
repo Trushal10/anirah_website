@@ -6,6 +6,8 @@ import Header from '@/components/public/Header'
 import Footer from '@/components/public/Footer'
 import HomePage from '@/components/public/HomePage'
 import ServicesPage from '@/components/public/ServicesPage'
+import SchemesPage from '@/components/public/SchemesPage'
+import SchemeDetailPage from '@/components/public/SchemeDetailPage'
 import BlogPage from '@/components/public/BlogPage'
 import BlogDetailPage from '@/components/public/BlogDetailPage'
 import ContentPage from '@/components/public/ContentPage'
@@ -13,6 +15,7 @@ import ContentDetailPage from '@/components/public/ContentDetailPage'
 import AboutPage from '@/components/public/AboutPage'
 import CareerPage from '@/components/public/CareerPage'
 import ContactPage from '@/components/public/ContactPage'
+import LegalPage from '@/components/public/LegalPage'
 import ServiceDetailPage from '@/components/public/ServiceDetailPage'
 import SubServiceDetailPage from '@/components/public/SubServiceDetailPage'
 import LoginDialog from '@/components/admin/LoginDialog'
@@ -29,6 +32,7 @@ import AdminTestimonials from '@/components/admin/AdminTestimonials'
 import AdminFAQs from '@/components/admin/AdminFAQs'
 import AdminTeam from '@/components/admin/AdminTeam'
 import AdminStats from '@/components/admin/AdminStats'
+import DynamicMetadata from '@/components/common/DynamicMetadata'
 
 export default function AppPage() {
   const { currentPage, setSettings, settings, isAdmin } = useAppStore()
@@ -81,6 +85,8 @@ export default function AppPage() {
       case 'services': return <ServicesPage />
       case 'service-detail': return <ServiceDetailPage />
       case 'subservice-detail': return <SubServiceDetailPage />
+      case 'government-schemes': return <SchemesPage />
+      case 'scheme-detail': return <SchemeDetailPage />
       case 'blog': return <BlogPage />
       case 'blog-detail': return <BlogDetailPage />
       case 'content': return <ContentPage />
@@ -88,12 +94,15 @@ export default function AppPage() {
       case 'about': return <AboutPage />
       case 'career': return <CareerPage />
       case 'contact': return <ContactPage />
+      case 'terms-conditions': return <LegalPage kind="terms" />
+      case 'privacy-policy': return <LegalPage kind="privacy" />
       default: return <HomePage />
     }
   }
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
+      <DynamicMetadata />
       <Header />
       <main className="flex-1">{renderPage()}</main>
       <Footer />

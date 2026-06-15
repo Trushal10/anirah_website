@@ -55,7 +55,7 @@ export default function ContentDetailPage() {
           <FadeIn><div className="rounded-2xl overflow-hidden shadow-xl mb-10 max-h-[400px]"><img src={article.coverImage} alt={article.title} className="w-full object-cover" /></div></FadeIn>
         )}
         <FadeIn>
-          <article className="prose prose-lg max-w-none text-gray-700 leading-relaxed mb-12" dangerouslySetInnerHTML={{ __html: richTextToHtml(article.content) }} />
+          <article className="prose-content max-w-none text-gray-700 leading-relaxed mb-12" dangerouslySetInnerHTML={{ __html: richTextToHtml(article.content) }} />
         </FadeIn>
       </div>
     </div>

@@ -88,15 +88,6 @@ export default function PanIndiaSection() {
             ))}
           </div>
         </ScrollAnimation>
-
-        <ScrollAnimation className="mt-10 text-center">
-          <p className="text-sm text-white/60">
-            And growing every day.{' '}
-            <a href="#contact" className="font-semibold text-mint-300 transition-colors hover:text-mint-200">
-              Check availability in your state
-            </a>
-          </p>
-        </ScrollAnimation>
       </div>
     </section>
   );

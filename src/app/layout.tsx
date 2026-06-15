@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 const geistSans = Geist({
@@ -14,36 +15,70 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://anirahadvisory.in";
+const siteTitle = "Anirah Advisory";
+const siteDescription =
+  "Anirah Advisory helps Indian startups, MSMEs, and entrepreneurs with business registration, funding support, government schemes, compliance, certification, and legal documentation.";
+
 export const metadata: Metadata = {
-  title: "FundGrow - MSME Funding & Business Consultancy in India",
-  description: "India's trusted MSME funding consultancy. Business registration, government schemes, loans, grants, legal compliance, and branding services. 40+ years of combined experience, 5000+ projects delivered.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Anirah Advisory | MSME Funding & Business Consultancy in India",
+    template: "%s | Anirah Advisory",
+  },
+  description: siteDescription,
   keywords: [
+    "Anirah Advisory",
     "MSME funding",
+    "MSME loan consultant",
     "business registration India",
     "government schemes",
     "startup funding",
     "business consultancy",
+    "business compliance",
     "MUDRA loan",
+    "CGTMSE loan",
+    "PMEGP loan",
     "SIDBI",
     "Startup India",
     "company registration",
     "GST registration",
-    "FundGrow",
+    "FSSAI registration",
+    "trademark registration",
   ],
-  authors: [{ name: "FundGrow" }],
+  authors: [{ name: "Anirah Advisory" }],
+  creator: "Anirah Advisory",
+  publisher: "Anirah Advisory",
+  category: "Business Consultancy",
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: "/favicon.ico",
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   openGraph: {
-    title: "FundGrow - MSME Funding & Business Consultancy",
-    description: "Empowering Indian MSMEs with funding, registration, and business growth solutions. 5000+ projects delivered across 36+ states.",
-    siteName: "FundGrow",
+    title: "Anirah Advisory | MSME Funding & Business Consultancy in India",
+    description: siteDescription,
+    url: siteUrl,
+    siteName: siteTitle,
+    locale: "en_IN",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "FundGrow - MSME Funding & Business Consultancy",
-    description: "Empowering Indian MSMEs with funding, registration, and business growth solutions.",
+    title: "Anirah Advisory | MSME Funding & Business Consultancy in India",
+    description: siteDescription,
   },
 };
 
@@ -68,6 +103,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           {children}
           <Toaster />
+          <SonnerToaster richColors position="top-right" />
         </ThemeProvider>
       </body>
     </html>

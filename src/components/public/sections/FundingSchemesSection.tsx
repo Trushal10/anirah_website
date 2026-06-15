@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { ScrollAnimation, StaggerContainer, StaggerItem } from '@/components/ui/ScrollAnimation';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { richTextToPlainText } from '@/lib/rich-text';
+import { useAppStore } from '@/store/app';
 
 /* ✅ TYPE */
 interface Scheme {
   id: string;
   title: string;
   slug: string;
+  summary?: string | null;
   description: string;
   category: string;
   image?: string | null;
@@ -25,6 +27,7 @@ type Props = {
 const filters = ['All Schemes', 'Loans', 'Subsidy', 'Grants'];
 
 export default function FundingSchemesSection({ schemes }: Props) {
+  const { navigate } = useAppStore();
   const [activeFilter, setActiveFilter] = useState('All Schemes');
 
   /* ✅ FILTER LOGIC */
@@ -60,7 +63,7 @@ export default function FundingSchemesSection({ schemes }: Props) {
               onClick={() => setActiveFilter(f)}
               className={`px-4 py-2 rounded-lg text-sm ${
                 activeFilter === f
-                  ? 'bg-gradient-to-r from-brand-500 to-mint-600 text-white'
+                  ? 'bg-[#F0B354] text-black shadow-none'
                   : 'bg-gray-100 text-gray-900'
               }`}
             >
@@ -73,7 +76,10 @@ export default function FundingSchemesSection({ schemes }: Props) {
         <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" staggerDelay={0.1}>
           {filtered.map((scheme) => (
             <StaggerItem key={scheme.title}>
-              <div className="surface-card surface-card-hover group relative p-6 h-full flex flex-col">
+              <button
+                onClick={() => navigate('scheme-detail', scheme.slug)}
+                className="surface-card surface-card-hover group relative p-6 h-full flex w-full flex-col text-left"
+              >
                 {/* {scheme.popular && (
                   <span className="absolute top-4 right-4 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-brand-50 text-brand-700 text-xs font-semibold">
                     <Sparkles className="w-3 h-3" />
@@ -101,7 +107,11 @@ export default function FundingSchemesSection({ schemes }: Props) {
 
                 <h3 className="text-lg font-bold text-gray-900 mb-1">{scheme.title}</h3>
                 {/* <p className="text-brand-600 font-semibold text-sm mb-2">{scheme.amount}</p> */}
-                <p className="text-sm text-gray-500 leading-relaxed mb-4 flex-1">{richTextToPlainText(scheme.description)}</p>
+                <p className="text-sm text-gray-500 leading-relaxed mb-4 flex-1">{scheme.summary || richTextToPlainText(scheme.description)}</p>
+                <span className="mt-auto inline-flex items-center gap-2 text-sm font-semibold text-mint-700">
+                  View Details
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </span>
 
                 {/* <div className="flex items-center gap-4 pt-4 border-t border-gray-100 text-xs text-gray-400">
                   <span className="flex items-center gap-1">
@@ -113,20 +123,10 @@ export default function FundingSchemesSection({ schemes }: Props) {
                     Time <strong className="text-gray-600">{scheme.time}</strong>
                   </span>
                 </div> */}
-              </div>
+              </button>
             </StaggerItem>
           ))}
         </StaggerContainer>
-
-        <ScrollAnimation className="text-center mt-10">
-          <a
-            href="#contact"
-            className="primary-action"
-          >
-            Explore All Schemes
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </a>
-        </ScrollAnimation>
 
       </div>
     </section>

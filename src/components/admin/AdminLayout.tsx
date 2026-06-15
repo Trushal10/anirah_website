@@ -68,7 +68,7 @@ function SidebarNav({
         <Shield className="h-6 w-6 shrink-0 text-primary" />
         {!collapsed && (
           <div className="flex flex-col min-w-0">
-            <span className="font-bold text-sm truncate text-foreground">FundGrow</span>
+            <span className="font-bold text-sm truncate text-foreground">Anirah Advisory</span>
             <span className="text-[10px] text-muted-foreground">Admin Panel</span>
           </div>
         )}

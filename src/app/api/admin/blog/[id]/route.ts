@@ -14,6 +14,9 @@ export async function PUT(
     if (body.slug !== undefined) data.slug = body.slug
     if (body.excerpt !== undefined) data.excerpt = body.excerpt
     if (body.content !== undefined) data.content = body.content
+    if (body.seoTitle !== undefined) data.seoTitle = body.seoTitle || null
+    if (body.seoDescription !== undefined) data.seoDescription = body.seoDescription || null
+    if (body.seoKeywords !== undefined) data.seoKeywords = body.seoKeywords || null
     if (body.coverImage !== undefined) data.coverImage = body.coverImage
     if (body.category !== undefined) data.category = body.category
     if (body.tags !== undefined) {

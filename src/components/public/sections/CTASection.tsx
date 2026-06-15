@@ -28,7 +28,7 @@ export default function CTASection() {
           </h2>
 
           <p className="text-lg text-white/70 max-w-2xl mx-auto mb-10">
-            Join 1,950+ successful businesses that have trusted FundGrow for
+            Join 1,950+ successful businesses that have trusted Anirah Advisory for
             registration, funding, certification, and compliance. Take the first
             step towards building your dream business.
           </p>

@@ -13,6 +13,9 @@ export async function PUT(
     if (body.name !== undefined) data.name = body.name
     if (body.slug !== undefined) data.slug = body.slug
     if (body.description !== undefined) data.description = body.description
+    if (body.seoTitle !== undefined) data.seoTitle = body.seoTitle || null
+    if (body.seoDescription !== undefined) data.seoDescription = body.seoDescription || null
+    if (body.seoKeywords !== undefined) data.seoKeywords = body.seoKeywords || null
     if (body.features !== undefined) {
       data.features = typeof body.features === 'string' ? body.features : JSON.stringify(body.features)
     }

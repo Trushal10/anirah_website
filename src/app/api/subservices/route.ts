@@ -1,6 +1,40 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { Prisma } from '@prisma/client'
+
+function parseList(value: string | null | undefined): string[] {
+  if (!value) return []
+  try {
+    const parsed = JSON.parse(value)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return value.split('\n').map((item) => item.trim()).filter(Boolean)
+  }
+}
+
+function parseProcess(value: string | null | undefined): { title: string; desc: string }[] {
+  if (!value) return []
+  try {
+    const parsed = JSON.parse(value)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
+function parseSubservice<T extends {
+  features: string
+  benefits: string
+  process: string
+  documents: string
+}>(subservice: T) {
+  return {
+    ...subservice,
+    features: parseList(subservice.features),
+    benefits: parseList(subservice.benefits),
+    process: parseProcess(subservice.process),
+    documents: parseList(subservice.documents),
+  }
+}
 
 export async function GET(request: Request) {
   try {
@@ -19,18 +53,7 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'Not found' }, { status: 404 })
       }
 
-      // Parse features JSON
-      let features: string[] = []
-      try {
-        features = JSON.parse(subservice.features || '[]')
-      } catch {
-        features = subservice.features ? subservice.features.split('\n').filter(Boolean) : []
-      }
-
-      return NextResponse.json({
-        ...subservice,
-        features,
-      })
+      return NextResponse.json(parseSubservice(subservice))
     }
 
     // Get all subservices
@@ -40,15 +63,7 @@ export async function GET(request: Request) {
       orderBy: [{ series: { order: 'asc' } }, { order: 'asc' }],
     })
 
-    const parsed = subservices.map((s) => {
-      let features: string[] = []
-      try {
-        features = JSON.parse(s.features || '[]')
-      } catch {
-        features = s.features ? s.features.split('\n').filter(Boolean) : []
-      }
-      return { ...s, features }
-    })
+    const parsed = subservices.map(parseSubservice)
 
     return NextResponse.json(parsed)
   } catch (error) {

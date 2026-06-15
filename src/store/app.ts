@@ -1,8 +1,8 @@
 import { create } from 'zustand'
 
-export type Page = 'home' | 'services' | 'service-detail' | 'subservice-detail' | 'blog' | 'blog-detail' | 'content' | 'content-detail' | 'about' | 'career' | 'contact' | 'admin' | 'admin-dashboard' | 'admin-settings' | 'admin-services' | 'admin-blog' | 'admin-content' | 'admin-careers' | 'admin-schemes' | 'admin-inquiries' | 'admin-testimonials' | 'admin-faqs' | 'admin-team' | 'admin-stats'
+export type Page = 'home' | 'services' | 'service-detail' | 'subservice-detail' | 'government-schemes' | 'scheme-detail' | 'blog' | 'blog-detail' | 'content' | 'content-detail' | 'about' | 'career' | 'contact' | 'terms-conditions' | 'privacy-policy' | 'admin' | 'admin-dashboard' | 'admin-settings' | 'admin-services' | 'admin-blog' | 'admin-content' | 'admin-careers' | 'admin-schemes' | 'admin-inquiries' | 'admin-testimonials' | 'admin-faqs' | 'admin-team' | 'admin-stats'
 
-const VALID_PAGES: Page[] = ['home', 'services', 'service-detail', 'subservice-detail', 'blog', 'blog-detail', 'content', 'content-detail', 'about', 'career', 'contact', 'admin', 'admin-dashboard', 'admin-settings', 'admin-services', 'admin-blog', 'admin-content', 'admin-careers', 'admin-schemes', 'admin-inquiries', 'admin-testimonials', 'admin-faqs', 'admin-team', 'admin-stats']
+const VALID_PAGES: Page[] = ['home', 'services', 'service-detail', 'subservice-detail', 'government-schemes', 'scheme-detail', 'blog', 'blog-detail', 'content', 'content-detail', 'about', 'career', 'contact', 'terms-conditions', 'privacy-policy', 'admin', 'admin-dashboard', 'admin-settings', 'admin-services', 'admin-blog', 'admin-content', 'admin-careers', 'admin-schemes', 'admin-inquiries', 'admin-testimonials', 'admin-faqs', 'admin-team', 'admin-stats']
 
 function loadFromStorage<T>(key: string, fallback: T): T {
   if (typeof window === 'undefined') return fallback
@@ -46,9 +46,13 @@ export const useAppStore = create<AppState>((set) => {
   const storedPage = loadFromStorage<Page>('currentPage', 'home')
   const storedParam = loadFromStorage<string | null>('pageParam', null)
 
-  // If admin was logged in and was on an admin page, restore that
-  const initialPage = storedIsAdmin && storedPage.startsWith('admin') ? storedPage : 'home'
-  const initialParam = storedIsAdmin && storedPage.startsWith('admin') ? storedParam : null
+  const isValidStoredPage = VALID_PAGES.includes(storedPage)
+  const isStoredAdminPage = isValidStoredPage && storedPage.startsWith('admin')
+  const canRestoreStoredPage = isValidStoredPage && (!isStoredAdminPage || storedIsAdmin)
+
+  // Restore the last public/admin page after browser refresh. Admin pages still require login.
+  const initialPage = canRestoreStoredPage ? storedPage : 'home'
+  const initialParam = canRestoreStoredPage ? storedParam : null
 
   return {
     currentPage: initialPage,

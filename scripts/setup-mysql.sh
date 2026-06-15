@@ -31,13 +31,13 @@ for i in $(seq 1 30); do
       echo "MySQL ready!"
       # Create database
       $MYSQL_HOME/bin/mysql -S $SOCKET_DIR/mysqld.sock -u root -e "
-        CREATE DATABASE IF NOT EXISTS fundgrow CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        CREATE DATABASE IF NOT EXISTS anirahadvisory CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
       " 2>/dev/null
       echo "Database created!"
       
       # Push schema
       cd /home/z/my-project
-      export DATABASE_URL="mysql://root:@127.0.0.1:3306/fundgrow"
+      export DATABASE_URL="mysql://root:@127.0.0.1:3306/anirahadvisory"
       bunx prisma db push --skip-generate 2>&1
       
       echo "Schema pushed!"

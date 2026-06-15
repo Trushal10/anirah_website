@@ -39,7 +39,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Plus, Pencil, Trash2, Eye, Loader2 } from 'lucide-react'
+import { ArrowLeft, Plus, Pencil, Trash2, Eye, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import ImageUpload from '@/components/admin/ImageUpload'
 import RichTextEditor from '@/components/admin/RichTextEditor'
@@ -51,6 +51,9 @@ interface BlogPost {
   slug: string
   excerpt: string
   content: string
+  seoTitle: string | null
+  seoDescription: string | null
+  seoKeywords: string | null
   coverImage: string | null
   category: string
   tags: string
@@ -67,6 +70,9 @@ const emptyForm = {
   slug: '',
   excerpt: '',
   content: '',
+  seoTitle: '',
+  seoDescription: '',
+  seoKeywords: '',
   coverImage: '',
   category: '',
   tags: '',
@@ -129,6 +135,9 @@ export default function AdminBlog() {
       slug: post.slug,
       excerpt: post.excerpt,
       content: post.content,
+      seoTitle: post.seoTitle || '',
+      seoDescription: post.seoDescription || '',
+      seoKeywords: post.seoKeywords || '',
       coverImage: post.coverImage || '',
       category: post.category,
       tags: tagsStr,
@@ -205,15 +214,25 @@ export default function AdminBlog() {
     <div className="p-4 md:p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold">Blog Posts</h2>
-          <p className="text-sm text-muted-foreground">Manage your blog content</p>
+          <h2 className="text-xl font-semibold">{dialogOpen ? (editing ? 'Edit Blog Post' : 'New Blog Post') : 'Blog Posts'}</h2>
+          <p className="text-sm text-muted-foreground">
+            {dialogOpen ? 'Write and format the full article content.' : 'Manage your blog content'}
+          </p>
         </div>
-        <Button onClick={openCreate}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Post
-        </Button>
+        {dialogOpen ? (
+          <Button variant="outline" onClick={() => setDialogOpen(false)}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+        ) : (
+          <Button onClick={openCreate}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Post
+          </Button>
+        )}
       </div>
 
+      {!dialogOpen && (
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
@@ -273,14 +292,13 @@ export default function AdminBlog() {
           </div>
         </CardContent>
       </Card>
+      )}
 
-      {/* Create/Edit Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editing ? 'Edit Blog Post' : 'New Blog Post'}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
+      {/* Create/Edit Page */}
+      {dialogOpen && (
+        <Card>
+          <CardContent className="p-4 md:p-6">
+          <div className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2 sm:col-span-2">
                 <Label>Title *</Label>
@@ -348,6 +366,38 @@ export default function AdminBlog() {
               minHeight="300px"
             />
             {errors.content && <p className="text-sm text-destructive">{errors.content}</p>}
+            <div className="rounded-lg border p-4 space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold">SEO Meta</h3>
+                <p className="text-xs text-muted-foreground">Used for this blog detail page.</p>
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Title</Label>
+                <Input
+                  value={form.seoTitle}
+                  onChange={(e) => setForm({ ...form, seoTitle: e.target.value })}
+                  placeholder="SEO title for this blog post"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Description</Label>
+                <Textarea
+                  value={form.seoDescription}
+                  onChange={(e) => setForm({ ...form, seoDescription: e.target.value })}
+                  rows={3}
+                  placeholder="SEO description for this blog post"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Keywords</Label>
+                <Textarea
+                  value={form.seoKeywords}
+                  onChange={(e) => setForm({ ...form, seoKeywords: e.target.value })}
+                  rows={2}
+                  placeholder="keyword one, keyword two, keyword three"
+                />
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Tags (comma-separated)</Label>
@@ -392,8 +442,9 @@ export default function AdminBlog() {
               {editing ? 'Update Post' : 'Create Post'}
             </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Preview Dialog */}
       <Dialog open={!!previewPost} onOpenChange={() => setPreviewPost(null)}>
@@ -410,7 +461,7 @@ export default function AdminBlog() {
               </div>
               <p className="text-muted-foreground italic">{previewPost.excerpt}</p>
               <div
-                className="prose prose-sm dark:prose-invert max-w-none"
+                className="prose-content max-w-none"
                 dangerouslySetInnerHTML={{ __html: richTextToHtml(previewPost.content) }}
               />
             </div>

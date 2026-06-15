@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Switch } from '@/components/ui/switch'
+import ImageUpload from '@/components/admin/ImageUpload'
 import {
   Table,
   TableBody,
@@ -302,11 +302,11 @@ export default function AdminTestimonials() {
               {errors.content && <p className="text-sm text-destructive">{errors.content}</p>}
             </div>
             <div className="space-y-2">
-              <Label>Avatar URL</Label>
-              <Input
+              <ImageUpload
+                label="Avatar Image"
                 value={form.avatarUrl}
-                onChange={(e) => setForm({ ...form, avatarUrl: e.target.value })}
-                placeholder="https://..."
+                onChange={(url) => setForm({ ...form, avatarUrl: url })}
+                folder="testimonials"
               />
             </div>
             <Button onClick={saveTestimonial} disabled={saving} className="w-full">

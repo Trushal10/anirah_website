@@ -62,6 +62,17 @@ const socialFields = [
   { key: 'facebook', label: 'Facebook URL', type: 'input', placeholder: 'https://facebook.com/yourpage' },
 ]
 
+const seoFields = [
+  { key: 'site_url', label: 'Site URL', type: 'input', placeholder: 'https://your-domain.com' },
+]
+
+const seoPages = [
+  { key: 'home', label: 'Home', path: '/' },
+  { key: 'about', label: 'About', path: '/about' },
+  { key: 'career', label: 'Career', path: '/career' },
+  { key: 'contact', label: 'Contact', path: '/contact' },
+]
+
 export default function AdminSettings() {
   const { setSettings: setPublicSettings } = useAppStore()
   const { resolvedTheme } = useTheme()
@@ -285,6 +296,7 @@ export default function AdminSettings() {
           <TabsTrigger value="about">About Content</TabsTrigger>
           <TabsTrigger value="stats">Stats Counters</TabsTrigger>
           <TabsTrigger value="logo">Logo</TabsTrigger>
+          <TabsTrigger value="seo">SEO Meta</TabsTrigger>
           <TabsTrigger value="social">Social Media</TabsTrigger>
           <TabsTrigger value="account">Account</TabsTrigger>
         </TabsList>
@@ -378,6 +390,72 @@ export default function AdminSettings() {
                   </div>
                 )}
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="seo">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">SEO Metadata</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <h3 className="mb-3 text-sm font-semibold">Technical SEO Settings</h3>
+                {renderFields(seoFields)}
+              </div>
+
+              <div className="space-y-5 border-t pt-6">
+                <h3 className="text-sm font-semibold">Page Metadata</h3>
+                {seoPages.map((page) => (
+                  <div key={page.key} className="rounded-lg border p-4">
+                    <div className="mb-4">
+                      <p className="font-medium">{page.label}</p>
+                      <p className="text-xs text-muted-foreground">{page.path}</p>
+                    </div>
+                    <div className="grid gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor={`seo_${page.key}_title`}>Meta Title</Label>
+                        <Input
+                          id={`seo_${page.key}_title`}
+                          value={settings[`seo_${page.key}_title`] || ''}
+                          onChange={(e) => handleChange(`seo_${page.key}_title`, e.target.value)}
+                          placeholder={`${page.label} page title`}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`seo_${page.key}_description`}>Meta Description</Label>
+                        <Textarea
+                          id={`seo_${page.key}_description`}
+                          value={settings[`seo_${page.key}_description`] || ''}
+                          onChange={(e) => handleChange(`seo_${page.key}_description`, e.target.value)}
+                          placeholder={`${page.label} page description`}
+                          rows={3}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`seo_${page.key}_keywords`}>Meta Keywords</Label>
+                        <Textarea
+                          id={`seo_${page.key}_keywords`}
+                          value={settings[`seo_${page.key}_keywords`] || ''}
+                          onChange={(e) => handleChange(`seo_${page.key}_keywords`, e.target.value)}
+                          placeholder="keyword one, keyword two, keyword three"
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <ImageUpload
+                value={settings.seo_image || ''}
+                onChange={(url) => handleChange('seo_image', url)}
+                label="Social Share Image"
+              />
+              <p className="text-xs text-muted-foreground">
+                Page metadata is applied dynamically on the public frontend when visitors navigate through the site.
+              </p>
             </CardContent>
           </Card>
         </TabsContent>

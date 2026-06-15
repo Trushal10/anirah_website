@@ -21,7 +21,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { name, slug, icon, tagline, description } = body
+    const { name, slug, icon, tagline, description, seoTitle, seoDescription, seoKeywords } = body
 
     if (!name || !slug || !icon || !tagline || !description) {
       return NextResponse.json(
@@ -31,7 +31,16 @@ export async function POST(req: NextRequest) {
     }
 
     const service = await db.serviceSeries.create({
-      data: { name, slug, icon, tagline, description },
+      data: {
+        name,
+        slug,
+        icon,
+        tagline,
+        description,
+        seoTitle: seoTitle || null,
+        seoDescription: seoDescription || null,
+        seoKeywords: seoKeywords || null,
+      },
     })
 
     return NextResponse.json(service, { status: 201 })

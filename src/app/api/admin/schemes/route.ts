@@ -16,11 +16,11 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { title, slug, description, benefits, eligibility, category, image } = body
+    const { title, slug, summary, description, benefits, eligibility, category, image } = body
 
-    if (!title || !slug || !description || !benefits || !eligibility || !category) {
+    if (!title || !slug || !summary || !description || !benefits || !eligibility || !category) {
       return NextResponse.json(
-        { error: 'Title, slug, description, benefits, eligibility, and category are required' },
+        { error: 'Title, slug, summary, description, benefits, eligibility, and category are required' },
         { status: 400 }
       )
     }
@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
       data: {
         title,
         slug,
+        summary,
         description,
         benefits: typeof benefits === 'string' ? benefits : JSON.stringify(benefits),
         eligibility,

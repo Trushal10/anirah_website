@@ -23,12 +23,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -38,15 +32,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react'
+import { ArrowLeft, Plus, Pencil, Trash2, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import ImageUpload from '@/components/admin/ImageUpload'
+import RichTextEditor from '@/components/admin/RichTextEditor'
 import { richTextToPlainText } from '@/lib/rich-text'
 
 interface Scheme {
   id: string
   title: string
   slug: string
+  summary: string | null
   description: string
   benefits: string
   eligibility: string
@@ -60,6 +56,7 @@ interface Scheme {
 const emptyForm = {
   title: '',
   slug: '',
+  summary: '',
   description: '',
   benefits: '',
   eligibility: '',
@@ -119,6 +116,7 @@ export default function AdminSchemes() {
     setForm({
       title: scheme.title,
       slug: scheme.slug,
+      summary: scheme.summary || richTextToPlainText(scheme.description),
       description: scheme.description,
       benefits: benefitsStr,
       eligibility: scheme.eligibility,
@@ -132,6 +130,7 @@ export default function AdminSchemes() {
     const newErrors: Record<string, string> = {}
     if (!form.title) newErrors.title = 'Title is required'
     if (!form.slug) newErrors.slug = 'Slug is required'
+    if (!form.summary) newErrors.summary = 'Summary is required'
     if (!form.description) newErrors.description = 'Description is required'
     if (!form.benefits) newErrors.benefits = 'Benefits are required'
     if (!form.eligibility) newErrors.eligibility = 'Eligibility is required'
@@ -191,15 +190,25 @@ export default function AdminSchemes() {
     <div className="p-4 md:p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold">Government Schemes</h2>
-          <p className="text-sm text-muted-foreground">Manage government scheme listings</p>
+          <h2 className="text-xl font-semibold">{dialogOpen ? (editing ? 'Edit Scheme' : 'New Scheme') : 'Government Schemes'}</h2>
+          <p className="text-sm text-muted-foreground">
+            {dialogOpen ? 'Write scheme details, eligibility, benefits, and images.' : 'Manage government scheme listings'}
+          </p>
         </div>
-        <Button onClick={openCreate}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Scheme
-        </Button>
+        {dialogOpen ? (
+          <Button variant="outline" onClick={() => setDialogOpen(false)}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+        ) : (
+          <Button onClick={openCreate}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Scheme
+          </Button>
+        )}
       </div>
 
+      {!dialogOpen && (
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
@@ -209,7 +218,7 @@ export default function AdminSchemes() {
                   <TableHead>Title</TableHead>
                   <TableHead className="hidden md:table-cell">Category</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="hidden lg:table-cell">Eligibility</TableHead>
+                  <TableHead className="hidden lg:table-cell">Summary</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -225,8 +234,8 @@ export default function AdminSchemes() {
                         {scheme.isActive ? 'Active' : 'Inactive'}
                       </Badge>
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell text-sm text-muted-foreground max-w-[200px] truncate">
-                      {richTextToPlainText(scheme.eligibility)}
+                    <TableCell className="hidden lg:table-cell text-sm text-muted-foreground max-w-[220px] truncate">
+                      {scheme.summary || richTextToPlainText(scheme.description)}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
@@ -252,14 +261,13 @@ export default function AdminSchemes() {
           </div>
         </CardContent>
       </Card>
+      )}
 
-      {/* Create/Edit Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editing ? 'Edit Scheme' : 'New Scheme'}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
+      {/* Create/Edit Page */}
+      {dialogOpen && (
+        <Card>
+          <CardContent className="p-4 md:p-6">
+          <div className="space-y-5">
             <div className="space-y-2">
               <Label>Title *</Label>
               <Input
@@ -293,12 +301,22 @@ export default function AdminSchemes() {
               {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
             </div>
             <div className="space-y-2">
-              <Label>Description *</Label>
+              <Label>Summary *</Label>
               <Textarea
+                value={form.summary}
+                onChange={(e) => setForm({ ...form, summary: e.target.value })}
+                rows={3}
+                placeholder="Short summary shown on frontend cards"
+              />
+              {errors.summary && <p className="text-sm text-destructive">{errors.summary}</p>}
+            </div>
+            <div>
+              <RichTextEditor
                 value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                rows={4}
-                placeholder="Detailed description of the scheme"
+                onChange={(value) => setForm({ ...form, description: value })}
+                label="Description"
+                placeholder="Detailed scheme description (Markdown supported)"
+                minHeight="300px"
               />
               {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
             </div>
@@ -332,8 +350,9 @@ export default function AdminSchemes() {
               {editing ? 'Update Scheme' : 'Create Scheme'}
             </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>

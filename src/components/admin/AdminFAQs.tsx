@@ -8,13 +8,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
   Table,
   TableBody,
   TableCell,
@@ -58,8 +51,6 @@ const emptyForm = {
   category: 'General',
   order: 0,
 }
-
-const faqCategories = ['General', 'Registration', 'Funding', 'Compliance', 'Tax', 'Legal', 'Services']
 
 export default function AdminFAQs() {
   const [faqs, setFaqs] = useState<FAQ[]>([])
@@ -110,6 +101,7 @@ export default function AdminFAQs() {
     const newErrors: Record<string, string> = {}
     if (!form.question) newErrors.question = 'Question is required'
     if (!form.answer) newErrors.answer = 'Answer is required'
+    if (!form.category) newErrors.category = 'Category is required'
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
       toast.error('Please fill in all required fields')
@@ -256,16 +248,15 @@ export default function AdminFAQs() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Category</Label>
-                <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {faqCategories.map((cat) => (
-                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Input
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  placeholder="Private Limited Company Registration"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Use the exact subservice or service name to show FAQs on that page.
+                </p>
+                {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
               </div>
               <div className="space-y-2">
                 <Label>Order</Label>

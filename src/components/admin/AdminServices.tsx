@@ -16,12 +16,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -32,6 +26,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import {
+  ArrowLeft,
   Plus,
   Pencil,
   Trash2,
@@ -53,6 +48,9 @@ interface SubService {
   name: string
   slug: string
   description: string
+  seoTitle: string | null
+  seoDescription: string | null
+  seoKeywords: string | null
   benefits: string
   process: string
   documents: string
@@ -73,6 +71,9 @@ interface ServiceSeries {
   icon: string
   tagline: string
   description: string
+  seoTitle: string | null
+  seoDescription: string | null
+  seoKeywords: string | null
   accentColor?: string
   order: number
   isActive: boolean
@@ -86,12 +87,18 @@ const emptyService = {
   icon: '',
   tagline: '',
   description: '',
+  seoTitle: '',
+  seoDescription: '',
+  seoKeywords: '',
 }
 
 const emptySubService = {
   name: '',
   slug: '',
   description: '',
+  seoTitle: '',
+  seoDescription: '',
+  seoKeywords: '',
   features: '',
   pricing: '',
   referenceLink: '',
@@ -188,6 +195,9 @@ export default function AdminServices() {
       icon: service.icon,
       tagline: service.tagline,
       description: service.description,
+      seoTitle: service.seoTitle || '',
+      seoDescription: service.seoDescription || '',
+      seoKeywords: service.seoKeywords || '',
     })
     setErrors({})
     setServiceDialogOpen(true)
@@ -256,11 +266,21 @@ export default function AdminServices() {
       return ''
     })()
     const processSteps = parseJsonProcess(sub.process || '[]')
+    const featuresArr = (() => {
+      try {
+        const parsed = JSON.parse(sub.features || '[]')
+        if (Array.isArray(parsed)) return (parsed as string[]).join('\n')
+      } catch { /* ignore */ }
+      return typeof sub.features === 'string' ? sub.features : ''
+    })()
     setSubForm({
       name: sub.name,
       slug: sub.slug,
       description: sub.description,
-      features: typeof sub.features === 'string' ? sub.features : JSON.stringify(sub.features),
+      seoTitle: (sub as any).seoTitle || '',
+      seoDescription: (sub as any).seoDescription || '',
+      seoKeywords: (sub as any).seoKeywords || '',
+      features: featuresArr,
       pricing: sub.pricing || '',
       referenceLink: (sub as any).referenceLink || '',
       registrationTime: (sub as any).registrationTime || '',
@@ -328,7 +348,7 @@ export default function AdminServices() {
           name: subForm.name,
           slug: subForm.slug,
           description: subForm.description,
-          features: subForm.features || '[]',
+          features: parseJsonArray(subForm.features),
           pricing: subForm.pricing || null,
           referenceLink: subForm.referenceLink || null,
           registrationTime: subForm.registrationTime || null,
@@ -336,6 +356,9 @@ export default function AdminServices() {
           documents: documentsJson,
           process: processJson,
           eligibility: subForm.eligibility || '',
+          seoTitle: subForm.seoTitle || null,
+          seoDescription: subForm.seoDescription || null,
+          seoKeywords: subForm.seoKeywords || null,
           seriesId: subForm.seriesId,
         }),
       })
@@ -383,15 +406,41 @@ export default function AdminServices() {
     <div className="p-4 md:p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold">Service Series</h2>
-          <p className="text-sm text-muted-foreground">Manage service categories and subservices</p>
+          <h2 className="text-xl font-semibold">
+            {serviceDialogOpen
+              ? editingService ? 'Edit Service Series' : 'Add Service Series'
+              : subDialogOpen
+                ? editingSub ? 'Edit Subservice' : 'Add Subservice'
+                : 'Service Series'}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {serviceDialogOpen
+              ? 'Edit the main service category details.'
+              : subDialogOpen
+                ? `Under: ${parentSeries?.name || 'Service'}`
+                : 'Manage service categories and subservices'}
+          </p>
         </div>
-        <Button onClick={openCreateService}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Service
-        </Button>
+        {serviceDialogOpen || subDialogOpen ? (
+          <Button
+            variant="outline"
+            onClick={() => {
+              setServiceDialogOpen(false)
+              setSubDialogOpen(false)
+            }}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+        ) : (
+          <Button onClick={openCreateService}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Service
+          </Button>
+        )}
       </div>
 
+      {!serviceDialogOpen && !subDialogOpen && (
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
@@ -461,9 +510,10 @@ export default function AdminServices() {
           </div>
         </CardContent>
       </Card>
+      )}
 
       {/* Subservice Panel */}
-      {subPanelSeries && (
+      {subPanelSeries && !serviceDialogOpen && !subDialogOpen && (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <CardTitle className="text-base">
@@ -527,12 +577,10 @@ export default function AdminServices() {
         </Card>
       )}
 
-      {/* Service Dialog */}
-      <Dialog open={serviceDialogOpen} onOpenChange={setServiceDialogOpen}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingService ? 'Edit Service Series' : 'Add Service Series'}</DialogTitle>
-          </DialogHeader>
+      {/* Service Form Page */}
+      {serviceDialogOpen && (
+        <Card>
+          <CardContent className="p-4 md:p-6">
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Name *</Label>
@@ -581,24 +629,59 @@ export default function AdminServices() {
               />
               {errors.s_description && <p className="text-sm text-destructive">{errors.s_description}</p>}
             </div>
+            <div className="rounded-lg border p-4 space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold">SEO Meta</h3>
+                <p className="text-xs text-muted-foreground">Used for this service detail page.</p>
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Title</Label>
+                <Input
+                  value={serviceForm.seoTitle}
+                  onChange={(e) => setServiceForm({ ...serviceForm, seoTitle: e.target.value })}
+                  placeholder="SEO title for this service"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Description</Label>
+                <Textarea
+                  value={serviceForm.seoDescription}
+                  onChange={(e) => setServiceForm({ ...serviceForm, seoDescription: e.target.value })}
+                  rows={3}
+                  placeholder="SEO description for this service"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Keywords</Label>
+                <Textarea
+                  value={serviceForm.seoKeywords}
+                  onChange={(e) => setServiceForm({ ...serviceForm, seoKeywords: e.target.value })}
+                  rows={2}
+                  placeholder="keyword one, keyword two, keyword three"
+                />
+              </div>
+            </div>
             <Button onClick={saveService} disabled={saving} className="w-full">
               {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {editingService ? 'Update Service' : 'Create Service'}
             </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+          </CardContent>
+        </Card>
+      )}
 
-      {/* Subservice Dialog */}
-      <Dialog open={subDialogOpen} onOpenChange={setSubDialogOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingSub ? 'Edit Subservice' : 'Add Subservice'}</DialogTitle>
-            <p className="text-sm text-muted-foreground">
-              Under: {parentSeries?.name}
-            </p>
-          </DialogHeader>
+      {/* Subservice Form Page */}
+      {subDialogOpen && (
+        <Card>
+          <CardContent className="p-4 md:p-6">
           <div className="space-y-5">
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+              <h3 className="font-semibold">Subservice content guide</h3>
+              <p className="mt-1 text-amber-900/80">
+                For pages like Private Limited Company Registration, use Description for the main intro, Services for items like DSC/MOA/MCA filing, Benefits for advantages, Documents for grouped document lists, and Process Steps for registration flow.
+                Add page-specific FAQs from the FAQ admin and set the category to this subservice name.
+              </p>
+            </div>
             {/* Basic Info */}
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Basic Information</h3>
@@ -632,16 +715,49 @@ export default function AdminServices() {
               {errors.sub_description && <p className="text-sm text-destructive">{errors.sub_description}</p>}
             </div>
 
-            {/* Features */}
+            <div className="rounded-lg border p-4 space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold">SEO Meta</h3>
+                <p className="text-xs text-muted-foreground">Used for this subservice detail page.</p>
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Title</Label>
+                <Input
+                  value={subForm.seoTitle}
+                  onChange={(e) => setSubForm({ ...subForm, seoTitle: e.target.value })}
+                  placeholder="SEO title for this subservice"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Description</Label>
+                <Textarea
+                  value={subForm.seoDescription}
+                  onChange={(e) => setSubForm({ ...subForm, seoDescription: e.target.value })}
+                  rows={3}
+                  placeholder="SEO description for this subservice"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Keywords</Label>
+                <Textarea
+                  value={subForm.seoKeywords}
+                  onChange={(e) => setSubForm({ ...subForm, seoKeywords: e.target.value })}
+                  rows={2}
+                  placeholder="keyword one, keyword two, keyword three"
+                />
+              </div>
+            </div>
+
+            {/* Services Covered */}
             <div className="space-y-2">
-              <Label>Features (one per line)</Label>
+              <Label>Services Covered (one per line)</Label>
               <Textarea
                 value={subForm.features}
                 onChange={(e) => setSubForm({ ...subForm, features: e.target.value })}
-                rows={4}
-                placeholder={"Feature 1\nFeature 2\nFeature 3"}
+                rows={6}
+                placeholder={"Name Availability Check\nCompany Name Reservation\nDigital Signature Certificate (DSC)\nDirector Identification Number (DIN)\nMOA & AOA Drafting\nMCA Incorporation Filing"}
               />
-              <p className="text-xs text-muted-foreground">One feature per line</p>
+              <p className="text-xs text-muted-foreground">Shown as the “Our Services” checklist on the public subservice page.</p>
             </div>
 
             {/* Benefits */}
@@ -651,7 +767,7 @@ export default function AdminServices() {
                 value={subForm.benefits}
                 onChange={(e) => setSubForm({ ...subForm, benefits: e.target.value })}
                 rows={4}
-                placeholder={"Benefit 1\nBenefit 2\nBenefit 3"}
+                placeholder={"Separate Legal Entity\nLimited Liability Protection\nBetter Business Credibility\nFunding & Investment Opportunities\nEasy Expansion"}
               />
               <p className="text-xs text-muted-foreground">One benefit per line</p>
             </div>
@@ -683,10 +799,11 @@ export default function AdminServices() {
                         placeholder="Step title"
                       />
                       <div className="flex gap-2">
-                        <Input
+                        <Textarea
                           value={step.desc}
                           onChange={(e) => updateProcessStep(index, 'desc', e.target.value)}
                           placeholder="Step description"
+                          rows={2}
                         />
                         <Button
                           type="button"
@@ -708,14 +825,14 @@ export default function AdminServices() {
 
             {/* Documents */}
             <div className="space-y-2">
-              <Label>Required Documents (one per line)</Label>
+              <Label>Required Documents (one per line, headings allowed)</Label>
               <Textarea
                 value={subForm.documents}
                 onChange={(e) => setSubForm({ ...subForm, documents: e.target.value })}
-                rows={4}
-                placeholder={"Document 1\nDocument 2\nDocument 3"}
+                rows={8}
+                placeholder={"For Directors:\nPAN Card\nAadhaar Card\nPassport Size Photograph\n\nAddress Proof:\nElectricity Bill\nBank Statement\n\nRegistered Office:\nRent Agreement\nNo Objection Certificate (NOC)"}
               />
-              <p className="text-xs text-muted-foreground">One document per line</p>
+              <p className="text-xs text-muted-foreground">Use lines ending with colon, like “For Directors:”, to create document groups on the public page.</p>
             </div>
 
             {/* Eligibility */}
@@ -767,8 +884,9 @@ export default function AdminServices() {
               {editingSub ? 'Update Subservice' : 'Create Subservice'}
             </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>

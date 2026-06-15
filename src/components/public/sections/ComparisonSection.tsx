@@ -1,92 +1,92 @@
 'use client';
 
-import { Check, X, Minus, ArrowRight } from 'lucide-react';
+import { Check, X, Minus } from 'lucide-react';
 import { ScrollAnimation } from '@/components/ui/ScrollAnimation';
 
 const comparisons = [
   {
     feature: 'Loan Approval Rate',
-    fundgrow: '95%',
+    anirahAdvisory: '95%',
     bank: '40-55%',
     other: '60-70%',
-    fundgrowBest: true,
+    anirahAdvisoryBest: true,
   },
   {
     feature: 'Average Processing Time',
-    fundgrow: '15-30 Days',
+    anirahAdvisory: '15-30 Days',
     bank: '45-90 Days',
     other: '30-60 Days',
-    fundgrowBest: true,
+    anirahAdvisoryBest: true,
   },
   {
     feature: 'Collateral-Free Options',
-    fundgrow: true,
+    anirahAdvisory: true,
     bank: false,
     other: true,
-    fundgrowBest: true,
+    anirahAdvisoryBest: true,
   },
   {
     feature: 'Government Scheme Access',
-    fundgrow: true,
+    anirahAdvisory: true,
     bank: true,
     other: false,
-    fundgrowBest: null,
+    anirahAdvisoryBest: null,
   },
   {
     feature: 'Dedicated Consultant',
-    fundgrow: true,
+    anirahAdvisory: true,
     bank: false,
     other: true,
-    fundgrowBest: true,
+    anirahAdvisoryBest: true,
   },
   {
     feature: 'Document Preparation',
-    fundgrow: true,
+    anirahAdvisory: true,
     bank: false,
     other: null,
-    fundgrowBest: true,
+    anirahAdvisoryBest: true,
   },
   {
     feature: '50+ Lending Partners',
-    fundgrow: true,
+    anirahAdvisory: true,
     bank: false,
     other: false,
-    fundgrowBest: true,
+    anirahAdvisoryBest: true,
   },
   {
     feature: 'Transparent Fees',
-    fundgrow: true,
+    anirahAdvisory: true,
     bank: true,
     other: false,
-    fundgrowBest: null,
+    anirahAdvisoryBest: null,
   },
   {
     feature: 'Pan-India Coverage',
-    fundgrow: '36 States',
+    anirahAdvisory: '36 States',
     bank: 'Urban Only',
     other: 'Major Cities',
-    fundgrowBest: true,
+    anirahAdvisoryBest: true,
   },
   {
     feature: 'Post-Funding Support',
-    fundgrow: true,
+    anirahAdvisory: true,
     bank: false,
     other: null,
-    fundgrowBest: true,
+    anirahAdvisoryBest: true,
   },
   {
     feature: 'Success-Based Fee Option',
-    fundgrow: true,
+    anirahAdvisory: true,
     bank: null,
     other: false,
-    fundgrowBest: true,
+    anirahAdvisoryBest: true,
   },
   {
     feature: 'Online Application',
-    fundgrow: true,
+    anirahAdvisory: true,
     bank: true,
     other: true,
-    fundgrowBest: null,
+    anirahAdvisoryBest: null,
   },
 ];
 
@@ -112,13 +112,13 @@ export default function ComparisonSection() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <ScrollAnimation className="text-center mb-12">
           <span className="section-kicker mb-4">
-            Why FundGrow?
+            Why Anirah Advisory?
           </span>
           <h2 className="section-heading mb-4">
             See how we <span className="text-brand-600">stack up</span>
           </h2>
           <p className="section-copy max-w-2xl mx-auto">
-            An honest comparison of what FundGrow offers versus going directly to banks
+            An honest comparison of what Anirah Advisory offers versus going directly to banks
             or working with other consultants. The numbers speak for themselves.
           </p>
         </ScrollAnimation>
@@ -126,17 +126,17 @@ export default function ComparisonSection() {
         <ScrollAnimation>
           <div className="surface-card overflow-hidden">
             {/* Table Header */}
-            <div className="hidden sm:grid sm:grid-cols-4 bg-gradient-to-r from-brand-500 to-mint-600 text-white">
+            <div className="hidden sm:grid sm:grid-cols-4 border-b-4 border-brand-400 bg-navy-950 text-white">
               <div className="p-4 font-semibold text-sm">Feature</div>
               <div className="p-4 font-bold text-sm text-center bg-white/20 rounded-none">
-                FundGrow
+                Anirah Advisory
               </div>
               <div className="p-4 font-semibold text-sm text-center">Direct to Bank</div>
               <div className="p-4 font-semibold text-sm text-center">Other Consultants</div>
             </div>
 
             {/* Mobile Header Row */}
-            <div className="sm:hidden bg-gradient-to-r from-brand-500 to-mint-600 text-white p-4">
+            <div className="sm:hidden border-b-4 border-brand-400 bg-navy-950 p-4 text-white">
               <div className="flex justify-between text-sm font-semibold">
                 <span>Feature</span>
                 <div className="flex gap-4 text-xs">
@@ -158,10 +158,10 @@ export default function ComparisonSection() {
                 <div className="p-3 sm:p-4 text-sm text-gray-700 font-medium">{row.feature}</div>
                 <div
                   className={`p-3 sm:p-4 flex justify-center items-center ${
-                    row.fundgrowBest === true ? 'bg-brand-50/50' : ''
+                    row.anirahAdvisoryBest === true ? 'bg-brand-50/50' : ''
                   }`}
                 >
-                  <CellValue value={row.fundgrow} best={row.fundgrowBest} />
+                  <CellValue value={row.anirahAdvisory} best={row.anirahAdvisoryBest} />
                 </div>
                 <div className="p-3 sm:p-4 flex justify-center items-center">
                   <CellValue value={row.bank} best={false} />
@@ -174,15 +174,6 @@ export default function ComparisonSection() {
           </div>
         </ScrollAnimation>
 
-        <ScrollAnimation className="text-center mt-10">
-          <a
-            href="#contact"
-            className="primary-action"
-          >
-            Experience the Difference
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </a>
-        </ScrollAnimation>
       </div>
     </section>
   );

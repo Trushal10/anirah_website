@@ -45,9 +45,9 @@ for i in $(seq 1 30); do
       echo "MySQL is ready!"
       # Setup database
       $MYSQL_HOME/bin/mysql -S $SOCKET_DIR/mysqld.sock -u root -e "
-        CREATE DATABASE IF NOT EXISTS fundgrow CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        CREATE DATABASE IF NOT EXISTS anirahadvisory CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
       " 2>/dev/null
-      echo "Database 'fundgrow' is ready!"
+      echo "Database 'Anirah Advisory' is ready!"
       exit 0
     fi
   fi

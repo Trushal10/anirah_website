@@ -5,11 +5,14 @@ import { useAppStore } from '@/store/app'
 import { Mail, MapPin, Phone, Send, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
+import TurnstileWidget from '@/components/common/TurnstileWidget'
 
 export default function ContactPage() {
   const { settings } = useAppStore()
   const { toast } = useToast()
   const [form, setForm] = useState({ name: '', email: '', phone: '', businessType: '', fundingAmount: '', message: '' })
+  const [formStartedAt] = useState(() => Date.now())
+  const [turnstileToken, setTurnstileToken] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [services, setServices] = useState<{ name: string; slug: string }[]>([])
 
@@ -19,7 +22,7 @@ export default function ContactPage() {
 
   const phone = settings.phone || '+91 9998006734'
   const phone2 = settings.phone2 || ''
-  const email = settings.email || 'support@fundgrow.in'
+  const email = settings.email || 'support@anirahadvisory.in'
   const email2 = settings.email2 || ''
   const address = settings.address || 'Ahmedabad, Gujarat, India'
 
@@ -33,13 +36,21 @@ export default function ContactPage() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, inquiryType: 'general' }),
+        body: JSON.stringify({ ...form, inquiryType: 'general', website: '', formStartedAt, turnstileToken }),
       })
-      if (!res.ok) throw new Error()
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Failed to submit inquiry')
+      }
       toast({ title: 'Success', description: "Your message has been sent. We'll contact you soon." })
       setForm({ name: '', email: '', phone: '', businessType: '', fundingAmount: '', message: '' })
-    } catch {
-      toast({ title: 'Error', description: 'Something went wrong.', variant: 'destructive' })
+      setTurnstileToken('')
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Something went wrong.',
+        variant: 'destructive',
+      })
     } finally {
       setSubmitting(false)
     }
@@ -136,7 +147,13 @@ export default function ContactPage() {
                   <textarea rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="How can we help you?" className="w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20" />
                 </label>
 
-                <Button onClick={submitContact} disabled={submitting} className="mt-6 h-12 rounded-lg bg-gradient-to-r from-brand-500 to-mint-600 px-8 font-semibold text-white hover:from-brand-400 hover:to-mint-500">
+                <TurnstileWidget
+                  onVerify={setTurnstileToken}
+                  onExpire={() => setTurnstileToken('')}
+                  className="mt-5"
+                />
+
+                <Button onClick={submitContact} disabled={submitting} className="mt-6 h-12 rounded-xl border border-[#F0B354] bg-[#F0B354] px-8 font-semibold text-black shadow-none hover:border-[#E4A13A] hover:bg-[#E4A13A] hover:text-black hover:shadow-none">
                   {submitting ? 'Sending...' : 'Submit enquiry'}
                   <Send className="ml-2 h-4 w-4" />
                 </Button>

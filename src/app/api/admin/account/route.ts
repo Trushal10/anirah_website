@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { hashPassword, verifyPassword } from '@/lib/password'
 
 export async function GET() {
   try {
@@ -42,7 +43,7 @@ export async function PUT(req: NextRequest) {
       if (!currentPassword) {
         return NextResponse.json({ error: 'Current password is required to set new password' }, { status: 400 })
       }
-      if (currentPassword !== admin.password) {
+      if (!verifyPassword(currentPassword, admin.password)) {
         return NextResponse.json({ error: 'Current password is incorrect' }, { status: 401 })
       }
       if (newPassword.length < 6) {
@@ -50,7 +51,7 @@ export async function PUT(req: NextRequest) {
       }
       await db.admin.update({
         where: { id: admin.id },
-        data: { password: newPassword },
+        data: { password: hashPassword(newPassword) },
       })
       passwordUpdated = true
     }
