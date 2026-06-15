@@ -93,7 +93,7 @@ model BlogPost {
   title       String   @db.VarChar(255)
   slug        String   @unique @db.VarChar(255)
   excerpt     String   @db.Text
-  content     String   @db.LongText
+  content     String   @db.Text
   seoTitle    String?  @db.VarChar(255)
   seoDescription String? @db.Text
   seoKeywords String?  @db.Text
@@ -114,7 +114,7 @@ model ContentArticle {
   title       String   @db.VarChar(255)
   slug        String   @unique @db.VarChar(255)
   excerpt     String   @db.Text
-  content     String   @db.LongText
+  content     String   @db.Text
   seoTitle    String?  @db.VarChar(255)
   seoDescription String? @db.Text
   seoKeywords String?  @db.Text
@@ -136,7 +136,7 @@ model Career {
   location     String   @db.VarChar(255)
   type         String   @db.VarChar(100) // Full Time, Part Time, Contract
   experience   String   @db.VarChar(255)
-  description  String   @db.LongText
+  description  String   @db.Text
   requirements String   @db.Text // JSON array
   department   String   @db.VarChar(255)
   salary       String?  @db.VarChar(255)
