@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { apiError } from '@/lib/api-error'
 import { db } from '@/lib/db'
 
 export async function GET() {
@@ -9,7 +10,7 @@ export async function GET() {
     return NextResponse.json(testimonials)
   } catch (error) {
     console.error('Error fetching admin testimonials:', error)
-    return NextResponse.json({ error: 'Failed to fetch testimonials' }, { status: 500 })
+    return apiError(error)
   }
 }
 
@@ -39,6 +40,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(testimonial, { status: 201 })
   } catch (error) {
     console.error('Error creating testimonial:', error)
-    return NextResponse.json({ error: 'Failed to create testimonial' }, { status: 500 })
+    return apiError(error)
   }
 }

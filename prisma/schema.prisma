@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("anirah_advisory_PRISMA_DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 // Admin user for the admin panel

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { apiError } from '@/lib/api-error'
 import { db } from '@/lib/db'
 import { hashPassword, verifyPassword } from '@/lib/password'
 
@@ -11,7 +12,7 @@ export async function GET() {
     return NextResponse.json({ email: admin.email, name: admin.name, role: admin.role })
   } catch (error) {
     console.error('Error fetching admin account:', error)
-    return NextResponse.json({ error: 'Failed to fetch account' }, { status: 500 })
+    return apiError(error)
   }
 }
 
@@ -67,6 +68,6 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ success: true, message: messages.join(' and ') + ' successfully' })
   } catch (error) {
     console.error('Error updating admin account:', error)
-    return NextResponse.json({ error: 'Failed to update account' }, { status: 500 })
+    return apiError(error)
   }
 }

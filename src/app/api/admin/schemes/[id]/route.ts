@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { apiError } from '@/lib/api-error'
 import { db } from '@/lib/db'
 
 export async function PUT(
@@ -31,7 +32,7 @@ export async function PUT(
     return NextResponse.json(scheme)
   } catch (error) {
     console.error('Error updating scheme:', error)
-    return NextResponse.json({ error: 'Failed to update scheme' }, { status: 500 })
+    return apiError(error)
   }
 }
 
@@ -45,6 +46,6 @@ export async function DELETE(
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting scheme:', error)
-    return NextResponse.json({ error: 'Failed to delete scheme' }, { status: 500 })
+    return apiError(error)
   }
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { apiError } from '@/lib/api-error'
 import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
 
@@ -47,6 +48,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url, filename: uniqueName, fileType, originalName: file.name })
   } catch (error) {
     console.error('Upload error:', error)
-    return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 })
+    return apiError(error)
   }
 }

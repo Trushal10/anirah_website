@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { apiError } from '@/lib/api-error'
 import { db } from '@/lib/db'
 import { checkRateLimit, cleanText, getClientIp, hasSpamSignals, isValidEmail, verifyTurnstileToken } from '@/lib/contact-security'
 
@@ -89,6 +90,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(inquiry, { status: 201 })
   } catch (error) {
     console.error('Error submitting contact inquiry:', error)
-    return NextResponse.json({ error: 'Failed to submit inquiry' }, { status: 500 })
+    return apiError(error)
   }
 }

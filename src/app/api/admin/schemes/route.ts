@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { apiError } from '@/lib/api-error'
 import { db } from '@/lib/db'
 
 export async function GET() {
@@ -9,7 +10,7 @@ export async function GET() {
     return NextResponse.json(schemes)
   } catch (error) {
     console.error('Error fetching admin schemes:', error)
-    return NextResponse.json({ error: 'Failed to fetch schemes' }, { status: 500 })
+    return apiError(error)
   }
 }
 
@@ -41,6 +42,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(scheme, { status: 201 })
   } catch (error) {
     console.error('Error creating scheme:', error)
-    return NextResponse.json({ error: 'Failed to create scheme' }, { status: 500 })
+    return apiError(error)
   }
 }

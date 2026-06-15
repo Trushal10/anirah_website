@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { apiError } from '@/lib/api-error'
 import { db } from '@/lib/db'
 
 export async function PUT(
@@ -27,7 +28,7 @@ export async function PUT(
     return NextResponse.json(testimonial)
   } catch (error) {
     console.error('Error updating testimonial:', error)
-    return NextResponse.json({ error: 'Failed to update testimonial' }, { status: 500 })
+    return apiError(error)
   }
 }
 
@@ -41,6 +42,6 @@ export async function DELETE(
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting testimonial:', error)
-    return NextResponse.json({ error: 'Failed to delete testimonial' }, { status: 500 })
+    return apiError(error)
   }
 }

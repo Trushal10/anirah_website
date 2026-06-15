@@ -1,30 +1,37 @@
-import { pbkdf2Sync, randomBytes, timingSafeEqual } from 'crypto'
+import bcrypt from 'bcryptjs'
+import { pbkdf2Sync, timingSafeEqual } from 'crypto'
 
-const HASH_PREFIX = 'pbkdf2-sha256'
+const LEGACY_HASH_PREFIX = 'pbkdf2-sha256'
 const ITERATIONS = 310000
 const KEY_LENGTH = 32
 const DIGEST = 'sha256'
+const BCRYPT_ROUNDS = 12
 
 export function hashPassword(password: string) {
-  const salt = randomBytes(16).toString('base64url')
-  const hash = pbkdf2Sync(password, salt, ITERATIONS, KEY_LENGTH, DIGEST).toString('base64url')
-
-  return `${HASH_PREFIX}$${ITERATIONS}$${salt}$${hash}`
+  return bcrypt.hashSync(password, BCRYPT_ROUNDS)
 }
 
 export function isPasswordHash(value: string) {
-  return value.startsWith(`${HASH_PREFIX}$`)
+  try {
+    return bcrypt.getRounds(value) > 0
+  } catch {
+    return false
+  }
 }
 
 export function verifyPassword(password: string, storedPassword: string) {
-  if (!isPasswordHash(storedPassword)) {
+  if (isPasswordHash(storedPassword)) {
+    return bcrypt.compareSync(password, storedPassword)
+  }
+
+  if (!storedPassword.startsWith(`${LEGACY_HASH_PREFIX}$`)) {
     return password === storedPassword
   }
 
   const [prefix, iterationsValue, salt, expectedHash] = storedPassword.split('$')
   const iterations = Number(iterationsValue)
 
-  if (prefix !== HASH_PREFIX || !Number.isInteger(iterations) || !salt || !expectedHash) {
+  if (prefix !== LEGACY_HASH_PREFIX || !Number.isInteger(iterations) || !salt || !expectedHash) {
     return false
   }
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { apiError } from '@/lib/api-error'
 import { db } from '@/lib/db'
 
 export async function POST(req: NextRequest) {
@@ -52,6 +53,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(subservice, { status: 201 })
   } catch (error) {
     console.error('Error creating subservice:', error)
-    return NextResponse.json({ error: 'Failed to create subservice' }, { status: 500 })
+    return apiError(error)
   }
 }

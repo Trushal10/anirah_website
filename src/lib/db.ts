@@ -8,11 +8,6 @@ export const db =
   globalForPrisma.prisma ??
   new PrismaClient({
     log: ['error', 'warn'],
-    datasources: {
-      db: {
-        url: process.env.DATABASE_URL || 'mysql://root:@127.0.0.1:3306/anirahadvisory',
-      },
-    },
   })
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db

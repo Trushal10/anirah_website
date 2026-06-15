@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { apiError } from '@/lib/api-error'
 import { db } from '@/lib/db'
 
 export async function PATCH(
@@ -20,7 +21,7 @@ export async function PATCH(
     return NextResponse.json(inquiry)
   } catch (error) {
     console.error('Error updating inquiry:', error)
-    return NextResponse.json({ error: 'Failed to update inquiry' }, { status: 500 })
+    return apiError(error)
   }
 }
 
@@ -34,6 +35,6 @@ export async function DELETE(
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting inquiry:', error)
-    return NextResponse.json({ error: 'Failed to delete inquiry' }, { status: 500 })
+    return apiError(error)
   }
 }
